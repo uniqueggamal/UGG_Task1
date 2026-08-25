@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:internship_task/homepage.dart';
+import 'package:internship_task/screens/homePage.dart';
 
 class Loginscreen extends StatefulWidget {
   const Loginscreen({super.key});
@@ -107,13 +107,17 @@ class _LoginscreenState extends State<Loginscreen> {
                   obscureText: hidePassword,
                 ),
                 SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: login,
-                  style: ButtonStyle(
-                    backgroundColor: WidgetStatePropertyAll(Colors.purple),
-                    foregroundColor: WidgetStatePropertyAll(Colors.white),
+                SizedBox(
+                  height: 40,
+                  width: 90,
+                  child: ElevatedButton(
+                    onPressed: login,
+                    style: ButtonStyle(
+                      backgroundColor: WidgetStatePropertyAll(Colors.purple),
+                      foregroundColor: WidgetStatePropertyAll(Colors.white),
+                    ),
+                    child: Text('Login', style: TextStyle(fontSize: 14)),
                   ),
-                  child: Text('Login'),
                 ),
               ],
             ),

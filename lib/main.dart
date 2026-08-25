@@ -1,16 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:internship_task/loginscreen.dart';
-import 'package:flutter/services.dart';
+import 'package:internship_task/providers/navProvider.dart';
+import 'package:internship_task/screens/basePage.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  SystemChrome.setSystemUIOverlayStyle(
-    const SystemUiOverlayStyle(
-      statusBarIconBrightness: Brightness.light,
-      systemNavigationBarIconBrightness: Brightness.light,
-    ),
+  runApp(
+    ChangeNotifierProvider(create: (_) => NavProvider(), child: const MyApp()),
   );
-
-  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -20,7 +16,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: const Loginscreen(),
+      home: const BasePage(),
     );
   }
 }
