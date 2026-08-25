@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 class NavProvider extends ChangeNotifier {
   int currentIndex = 0;
   String subIndex = "Subjects";
+  bool authState = false;
+
   bool backState = false;
   void changeIndex(int index) {
     currentIndex = index;
@@ -33,5 +35,13 @@ class NavProvider extends ChangeNotifier {
     } else {
       backState = false;
     }
+  }
+
+  void login() {
+    authState = true;
+  }
+
+  void logout() {
+    authState = false;
   }
 }

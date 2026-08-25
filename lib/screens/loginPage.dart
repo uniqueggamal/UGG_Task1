@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:internship_task/providers/navProvider.dart';
+import 'package:internship_task/screens/basePage.dart';
 import 'package:internship_task/screens/homePage.dart';
+import 'package:provider/provider.dart';
 
 class Loginscreen extends StatefulWidget {
   const Loginscreen({super.key});
@@ -14,20 +17,10 @@ class _LoginscreenState extends State<Loginscreen> {
   final password = TextEditingController(text: "2026");
   bool hidePassword = true;
 
-  void login() {
-    if (username.text == 'NCCSIntern') {
-      if (password.text == '2026') {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => Homepage()),
-        );
-      }
-    }
-    return;
-  }
-
   @override
   Widget build(BuildContext context) {
+    final navProvider = context.watch<NavProvider>();
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: Padding(
@@ -111,7 +104,18 @@ class _LoginscreenState extends State<Loginscreen> {
                   height: 40,
                   width: 90,
                   child: ElevatedButton(
-                    onPressed: login,
+                    onPressed: () {
+                      if (username.text == 'NCCSIntern') {
+                        if (password.text == '2026') {
+                          navProvider.login();
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => BasePage()),
+                          );
+                        }
+                      }
+                      return;
+                    },
                     style: ButtonStyle(
                       backgroundColor: WidgetStatePropertyAll(Colors.purple),
                       foregroundColor: WidgetStatePropertyAll(Colors.white),

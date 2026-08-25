@@ -14,46 +14,94 @@ class _BottomNavBarState extends State<BottomNavBar> {
   Widget build(BuildContext context) {
     final navProvider = context.watch<NavProvider>();
 
+    final activeColor = Colors.purple;
+    final inactiveColor = Colors.grey;
+
+    final activeIconSize = 40.0;
+    final inactiveIconSize = 30.0;
+
+    final activeStyleText = TextStyle(color: activeColor, fontSize: 12);
+
+    final inactiveStyleText = TextStyle(color: inactiveColor, fontSize: 11);
+
     return BottomAppBar(
+      height: 100,
       color: Colors.white10,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          IconButton(
-            onPressed: () {
-              navProvider.changeIndex(0);
-            },
-            icon: Icon(
-              Icons.home,
-              color: navProvider.currentIndex == 0
-                  ? Colors.purple
-                  : Colors.grey,
-              size: navProvider.currentIndex == 0 ? 40 : 30,
-            ),
+          Column(
+            children: [
+              IconButton(
+                padding: EdgeInsets.zero,
+                onPressed: () {
+                  navProvider.changeIndex(0);
+                },
+                icon: Icon(
+                  Icons.home,
+                  color: navProvider.currentIndex == 0
+                      ? activeColor
+                      : inactiveColor,
+                  size: navProvider.currentIndex == 0
+                      ? activeIconSize
+                      : inactiveIconSize,
+                ),
+              ),
+              Text(
+                "Home",
+                style: navProvider.currentIndex == 0
+                    ? activeStyleText
+                    : inactiveStyleText,
+              ),
+            ],
           ),
-          IconButton(
-            onPressed: () {
-              navProvider.changeIndex(1);
-            },
-            icon: Icon(
-              Icons.book,
-              color: navProvider.currentIndex == 1
-                  ? Colors.purple
-                  : Colors.grey,
-              size: navProvider.currentIndex == 1 ? 40 : 30,
-            ),
+          Column(
+            children: [
+              IconButton(
+                onPressed: () {
+                  navProvider.changeIndex(1);
+                },
+                icon: Icon(
+                  Icons.book,
+                  color: navProvider.currentIndex == 1
+                      ? activeColor
+                      : inactiveColor,
+                  size: navProvider.currentIndex == 1
+                      ? activeIconSize
+                      : inactiveIconSize,
+                ),
+              ),
+              Text(
+                "Subjects",
+                style: navProvider.currentIndex == 1
+                    ? activeStyleText
+                    : inactiveStyleText,
+              ),
+            ],
           ),
-          IconButton(
-            onPressed: () {
-              navProvider.changeIndex(2);
-            },
-            icon: Icon(
-              Icons.person,
-              color: navProvider.currentIndex == 2
-                  ? Colors.purple
-                  : Colors.grey,
-              size: navProvider.currentIndex == 2 ? 40 : 30,
-            ),
+          Column(
+            children: [
+              IconButton(
+                onPressed: () {
+                  navProvider.changeIndex(2);
+                },
+                icon: Icon(
+                  Icons.person,
+                  color: navProvider.currentIndex == 2
+                      ? activeColor
+                      : inactiveColor,
+                  size: navProvider.currentIndex == 2
+                      ? activeIconSize
+                      : inactiveIconSize,
+                ),
+              ),
+              Text(
+                "Profile",
+                style: navProvider.currentIndex == 2
+                    ? activeStyleText
+                    : inactiveStyleText,
+              ),
+            ],
           ),
         ],
       ),
