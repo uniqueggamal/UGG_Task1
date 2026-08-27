@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:internship_task/providers/navProvider.dart';
 import 'package:internship_task/screens/basePage.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 void main() {
   runApp(
@@ -14,9 +15,9 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: const BasePage(),
+    return ScreenUtilInit(
+      designSize: Size(412, 915),
+      child: MaterialApp(debugShowCheckedModeBanner: false, home: BasePage()),
     );
   }
 }
