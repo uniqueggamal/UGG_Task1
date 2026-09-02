@@ -17,7 +17,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return ScreenUtilInit(
       designSize: Size(412, 915),
-      child: MaterialApp(debugShowCheckedModeBanner: false, home: BasePage()),
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: BasePage(),
+      ),
     );
   }
 }
