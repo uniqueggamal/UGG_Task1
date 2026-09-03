@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:internship_task/providers/navProvider.dart';
-import 'package:internship_task/utils/app_styles.dart';
+import 'package:internship_task/providers/nav_provider.dart';
+import 'package:internship_task/shared/utils/app_styles.dart';
 import 'package:provider/provider.dart';
 
 class BottomNavBar extends StatefulWidget {

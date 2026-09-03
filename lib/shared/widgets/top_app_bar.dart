@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:internship_task/providers/navProvider.dart';
-import 'package:internship_task/screens/basePage.dart';
-import 'package:internship_task/screens/loginPage.dart';
-import 'package:internship_task/utils/app_styles.dart';
+import 'package:internship_task/providers/nav_provider.dart';
+import 'package:internship_task/screens/base/base_screen.dart';
+import 'package:internship_task/screens/login/login_screen.dart';
+import 'package:internship_task/shared/utils/app_styles.dart';
 import 'package:provider/provider.dart';
 
 class TopAppBar extends StatelessWidget {
@@ -74,11 +74,11 @@ class TopAppBar extends StatelessWidget {
                       MaterialPageRoute(
                         builder: (context) {
                           if (navProvider.currentIndex == 0) {
-                            return const Loginscreen();
+                            return const LoginScreen();
                           }
 
                           if (navProvider.currentIndex == 2) {
-                            return const BasePage();
+                            return const BaseScreen();
                             // return const SizedBox.shrink();
                           }
 

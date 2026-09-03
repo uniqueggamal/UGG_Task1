@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:internship_task/utils/app_styles.dart';
+import 'package:internship_task/shared/utils/app_styles.dart';
 
-class Homepage extends StatelessWidget {
-  const Homepage({super.key});
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

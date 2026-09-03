@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:internship_task/providers/navProvider.dart';
-import 'package:internship_task/screens/basePage.dart';
+import 'package:internship_task/providers/nav_provider.dart';
+import 'package:internship_task/screens/base/base_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
       designSize: Size(412, 915),
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        home: BasePage(),
+        home: const BaseScreen(),
       ),
     );
   }

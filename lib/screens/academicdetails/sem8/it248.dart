@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:internship_task/utils/app_styles.dart';
+import 'package:internship_task/shared/utils/app_styles.dart';
 
 class It248 extends StatefulWidget {
   const It248({super.key});

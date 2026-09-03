@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:internship_task/providers/navProvider.dart';
+import 'package:internship_task/providers/nav_provider.dart';
 import 'package:internship_task/screens/academicdetails/sem8/it248.dart';
 import 'package:internship_task/screens/academicdetails/sem8/it249.dart';
 import 'package:internship_task/screens/academicdetails/sem8/it250.dart';
 import 'package:internship_task/screens/academicdetails/sem8/it277.dart';
-import 'package:internship_task/utils/app_styles.dart';
+import 'package:internship_task/shared/utils/app_styles.dart';
 import 'package:provider/provider.dart';
 
-class AcademicDetailsPage extends StatefulWidget {
-  const AcademicDetailsPage({super.key});
+class AcademicDetailsScreen extends StatefulWidget {
+  const AcademicDetailsScreen({super.key});
 
   @override
-  State<AcademicDetailsPage> createState() => _AcademicDetailsPageState();
+  State<AcademicDetailsScreen> createState() => _AcademicDetailsScreenState();
 }
 
-class _AcademicDetailsPageState extends State<AcademicDetailsPage> {
+class _AcademicDetailsScreenState extends State<AcademicDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     final selectedSubject = context.watch<NavProvider>().subIndex;

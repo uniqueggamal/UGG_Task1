@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:internship_task/utils/app_styles.dart';
+import 'package:internship_task/shared/utils/app_styles.dart';
 
-class ProfilePage extends StatefulWidget {
-  const ProfilePage({super.key});
+class ProfileScreen extends StatefulWidget {
+  const ProfileScreen({super.key});
 
   @override
-  State<ProfilePage> createState() => _ProfilePageState();
+  State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfilePageState extends State<ProfilePage> {
+class _ProfileScreenState extends State<ProfileScreen> {
   final String description =
       "I am an enthusiastic and motivated Information Management student "
       "with a strong academic background in information technology, business, "
@@ -88,10 +88,10 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                       child: ConstrainedBox(
                         constraints: BoxConstraints(
-                          minHeight: 80.h,
-                          minWidth: 80.h,
-                          maxHeight: 300.h,
-                          maxWidth: 300.w,
+                          minHeight: 80,
+                          minWidth: 80,
+                          maxHeight: 300,
+                          maxWidth: 300,
                         ),
                         child: ClipOval(
                           child: Image.asset(
