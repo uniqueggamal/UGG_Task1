@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:internship_task/providers/nav_provider.dart';
-import 'package:internship_task/screens/base/base_screen.dart';
+import 'package:internship_task/core/providers/nav_provider.dart';
+import 'package:internship_task/app/app_shell/base/screens/base_screen.dart';
+import 'package:internship_task/features/auth/screens/login_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -15,11 +16,12 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final navProvider = NavProvider();
     return ScreenUtilInit(
       designSize: Size(412, 915),
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        home: const BaseScreen(),
+        home: navProvider.authState ? BaseScreen() : LoginScreen(),
       ),
     );
   }
