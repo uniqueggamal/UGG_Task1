@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:internship_task/core/theme/app_styles.dart';
+import 'package:internship_task/core/theme/app_colors.dart';
+import 'package:internship_task/core/theme/app_text_styles.dart';
 
 /// Reusable primary action button for authentication forms
 /// Supports loading state
-class AuthButton extends StatelessWidget {
+class AppButton extends StatelessWidget {
   final String text;
   final bool isLoading;
   final VoidCallback? onPressed;
@@ -17,7 +18,7 @@ class AuthButton extends StatelessWidget {
   final Widget? loadingIndicator;
   final TextStyle? textStyle;
 
-  const AuthButton({
+  const AppButton({
     super.key,
     required this.text,
     this.isLoading = false,

@@ -1,13 +1,29 @@
 import 'package:flutter/material.dart';
-import 'package:internship_task/core/providers/nav_provider.dart';
-import 'package:internship_task/app/app_shell/base/screens/base_screen.dart';
-import 'package:internship_task/features/auth/screens/login_screen.dart';
-import 'package:provider/provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
 
-void main() {
+import 'package:internship_task/app/routes.dart';
+import 'package:internship_task/core/providers/nav_provider.dart';
+import 'package:internship_task/core/providers/sub_provider.dart';
+import 'package:internship_task/core/theme/app_theme.dart';
+import 'package:internship_task/features/auth/providers/auth_provider.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  final authProvider = AuthProvider();
+
+  await authProvider.checkAuth();
+
   runApp(
-    ChangeNotifierProvider(create: (_) => NavProvider(), child: const MyApp()),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => NavProvider()),
+        ChangeNotifierProvider(create: (_) => SubProvider()),
+        ChangeNotifierProvider.value(value: authProvider),
+      ],
+      child: const MyApp(),
+    ),
   );
 }
 
@@ -16,13 +32,22 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final navProvider = NavProvider();
     return ScreenUtilInit(
-      designSize: Size(412, 915),
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        home: navProvider.authState ? BaseScreen() : LoginScreen(),
-      ),
+      designSize: const Size(412, 915),
+      minTextAdapt: true,
+      splitScreenMode: true,
+      builder: (context, child) {
+        final authProvider = context.read<AuthProvider>();
+
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme.light,
+          initialRoute: authProvider.authState
+              ? AppRoutes.home
+              : AppRoutes.login,
+          routes: AppRoutes.routes,
+        );
+      },
     );
   }
 }

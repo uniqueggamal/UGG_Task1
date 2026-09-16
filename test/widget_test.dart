@@ -7,10 +7,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:internship_task/core/providers/nav_provider.dart';
 import 'package:provider/provider.dart';
 
 import 'package:internship_task/main.dart';
-import 'package:internship_task/providers/navProvider.dart';
 
 void main() {
   testWidgets('bottom navigation changes the displayed page', (tester) async {

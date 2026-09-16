@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:internship_task/core/theme/app_styles.dart';
+import 'package:internship_task/core/theme/app_colors.dart';
+import 'package:internship_task/core/theme/app_text_styles.dart';
 
 /// Reusable footer link widget for authentication forms
 /// Used for navigation between login and register screens

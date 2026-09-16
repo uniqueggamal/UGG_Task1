@@ -1,10 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:internship_task/app/routes.dart';
+import 'package:internship_task/core/storage/preference_storage.dart';
+import 'package:internship_task/core/theme/app_dimensions.dart';
+import 'package:internship_task/core/theme/app_radius.dart';
+import 'package:internship_task/core/utils/validators.dart';
+import 'package:internship_task/core/widgets/app_button.dart';
+import 'package:internship_task/core/widgets/app_message.dart';
+import 'package:internship_task/core/widgets/cutom_textfield/custom_textfield.dart';
+import 'package:internship_task/core/widgets/cutom_textfield/models/custom_textfield_model.dart';
+import 'package:internship_task/features/auth/providers/auth_provider.dart';
 import 'package:internship_task/core/providers/nav_provider.dart';
 import 'package:internship_task/app/app_shell/base/screens/base_screen.dart';
 import 'package:internship_task/features/auth/services/auth_service.dart';
 import 'package:internship_task/features/auth/widgets/form_items/auth_header.dart';
-import 'package:internship_task/core/theme/app_styles.dart';
+import 'package:internship_task/core/theme/app_spacing.dart';
 import 'package:internship_task/core/widgets/text_field.dart';
 import 'package:provider/provider.dart';
 import '../widgets/background_items/auth_background.dart';
@@ -26,11 +36,18 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final email = TextEditingController(text: "unique@gmail.com");
-  final password = TextEditingController(text: "unique");
+  late var password = TextEditingController(text: "unique");
+  final _formKey = GlobalKey<FormState>();
+  FieldState emailState = FieldState.normal;
+  String? emailMessage;
+
+  FieldState passwordState = FieldState.normal;
+  String? passwordMessage;
 
   bool hidePassword = true;
-  bool isLoading = false;
-  String? errorMessage;
+  bool _isLoading = false;
+
+  PreferencesService save = PreferencesService();
 
   @override
   void dispose() {
@@ -39,40 +56,103 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
+  void passwordDispose() {
+    password = TextEditingController(text: "");
+  }
+
+  Future<void> _login(String email, String password) async {
+    _isLoading = true;
+    try {
+      await context.read<AuthProvider>().login(
+        email: email,
+        password: password,
+      );
+
+      if (!context.mounted) return;
+
+      AppMessage.show(
+        context,
+        message: 'Login successful',
+        type: MessageType.success,
+      );
+      Navigator.pushNamed(context, AppRoutes.home);
+    } on AuthException catch (e) {
+      if (!context.mounted) return;
+      AppMessage.show(context, message: e.message, type: MessageType.error);
+    }
+    _isLoading = false;
+  }
+
+  void _validateEmail(String value) {
+    final message = Validators.validateEmail(value);
+
+    setState(() {
+      emailMessage = message;
+      emailState = message == null ? FieldState.normal : FieldState.error;
+    });
+  }
+
   Widget loginFormFields() {
-    return Column(
-      children: [
-        LabeledTextField(
-          label: 'Email',
-          controller: email,
-          icon: Icons.person_outline,
-          hintText: 'Enter email',
-          isLoading: isLoading,
-          labelFieldSpacing: AppSpacing.sm.h,
-        ),
-        SizedBox(height: AppSpacing.lg.h),
-        LabeledTextField(
-          label: 'Password',
-          controller: password,
-          icon: Icons.lock_outline,
-          hintText: 'Enter password',
-          obscureText: hidePassword,
-          isLoading: isLoading,
-          labelFieldSpacing: AppSpacing.sm.h,
-          suffixIcon: IconButton(
-            onPressed: () {
-              setState(() {
-                hidePassword = !hidePassword;
-              });
-            },
-            icon: Icon(
-              hidePassword
-                  ? Icons.visibility_off_outlined
-                  : Icons.visibility_outlined,
+    return Form(
+      key: _formKey,
+      child: Column(
+        children: [
+          CustomTextField(
+            model: CustomTextFieldModel(
+              controller: email,
+              labelText: 'Email',
+              hintText: 'Enter email',
+              prefixIcon: Icons.person_outline,
+              keyboardType: TextInputType.emailAddress,
+              textInputAction: TextInputAction.next,
+              enabled: !_isLoading,
+
+              state: emailState,
+              message: emailMessage,
+
+              onChanged: _validateEmail,
             ),
           ),
-        ),
-      ],
+          30.h.verticalSpace,
+          CustomTextField(
+            model: CustomTextFieldModel(
+              inputDecoration: InputDecoration(),
+              controller: password,
+              labelText: 'Password',
+              hintText: 'Enter password',
+              prefixIcon: Icons.lock_outline,
+              obscureText: hidePassword,
+              keyboardType: TextInputType.visiblePassword,
+              textInputAction: TextInputAction.done,
+              enabled: !_isLoading,
+              suffixIcon: IconButton(
+                onPressed: () {
+                  setState(() {
+                    hidePassword = !hidePassword;
+                  });
+                },
+                icon: Icon(
+                  hidePassword
+                      ? Icons.visibility_off_outlined
+                      : Icons.visibility_outlined,
+                ),
+              ),
+            ),
+          ),
+          30.h.verticalSpace,
+          AppButton(
+            text: 'Login',
+            height: AppDimensions.buttonHeight,
+            borderRadius: AppRadius.small,
+            onPressed: () {
+              if (_formKey.currentState!.validate()) {
+                _login(email.text, password.text);
+              }
+              passwordDispose();
+            },
+          ),
+        ],
+      ),
     );
   }
 
@@ -99,6 +179,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final navProvider = context.watch<NavProvider>();
+    final authProvider = context.watch<AuthProvider>();
 
     return Scaffold(
       body: Stack(
@@ -133,59 +214,6 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: AuthCard(
                           headerFields: [loginHeaderFields()],
                           formFields: [loginFormFields()],
-                          errorMessage: errorMessage,
-                          buttonText: 'Login',
-                          isLoading: isLoading,
-                          onButtonPressed: () async {
-                            setState(() {
-                              isLoading = true;
-                              errorMessage = null;
-                            });
-
-                            try {
-                              final loginResponse = await AuthService().login(
-                                email: email.text,
-                                password: password.text,
-                              );
-
-                              if (loginResponse != null &&
-                                  loginResponse['token'] != null) {
-                                final token = loginResponse['token'];
-                                final userResponse = await AuthService()
-                                    .getUser(token);
-
-                                if (userResponse != null) {
-                                  print('Authenticated user: $userResponse');
-                                  navProvider.login();
-                                  Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) => const BaseScreen(),
-                                    ),
-                                  );
-                                } else {
-                                  setState(() {
-                                    errorMessage = 'Failed to fetch user data';
-                                  });
-                                }
-                              } else {
-                                setState(() {
-                                  errorMessage = 'Invalid credentials';
-                                });
-                              }
-                            } catch (e) {
-                              setState(() {
-                                errorMessage =
-                                    'Login failed. Please try again.';
-                              });
-                            } finally {
-                              if (mounted) {
-                                setState(() {
-                                  isLoading = false;
-                                });
-                              }
-                            }
-                          },
                           dividerText: 'or',
                           footerText: "Don't have an account? Create one",
                           onFooterPressed: () {},

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:internship_task/core/theme/app_styles.dart';
+import 'package:internship_task/core/theme/app_colors.dart';
 
 /// A decorative circle used in the login background
 class BackgroundCircle extends StatelessWidget {

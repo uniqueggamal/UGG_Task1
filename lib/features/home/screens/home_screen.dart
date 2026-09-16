@@ -4,7 +4,7 @@ import 'package:internship_task/features/home/widgets/identity_card_header.dart'
 import 'package:internship_task/features/home/widgets/info_rows_section.dart';
 import 'package:internship_task/features/home/widgets/name_section.dart';
 import 'package:internship_task/features/home/widgets/profile_image.dart';
-import 'package:internship_task/core/theme/app_styles.dart';
+import 'package:internship_task/core/theme/app_spacing.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});

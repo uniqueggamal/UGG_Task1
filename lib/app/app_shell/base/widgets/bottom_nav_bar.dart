@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:internship_task/core/providers/nav_provider.dart';
-import 'package:internship_task/core/theme/app_styles.dart';
+import 'package:internship_task/core/theme/app_colors.dart';
+import 'package:internship_task/core/theme/app_spacing.dart';
+import 'package:internship_task/core/theme/app_text_styles.dart';
+import 'package:internship_task/core/theme/app_radius.dart';
 import 'package:provider/provider.dart';
 
 class BottomNavBar extends StatefulWidget {
@@ -15,19 +18,19 @@ class _BottomNavBarState extends State<BottomNavBar> {
   @override
   Widget build(BuildContext context) {
     final navProvider = context.watch<NavProvider>();
-
-    final activeColor = Colors.purple;
-    final inactiveColor = Colors.grey;
+    
+    // final activeColor = Colors.purple;
+    // final inactiveColor = Colors.grey;
 
     final activeIconSize = 40.r;
     final inactiveIconSize = 30.r;
 
     final activeStyleText = AppTextStyles.labelLarge.copyWith(
-      color: activeColor,
+      color: AppColors.primary,
     );
 
     final inactiveStyleText = AppTextStyles.labelSmall.copyWith(
-      color: inactiveColor,
+      color: AppColors.inactive,
     );
 
     return Container(
@@ -38,7 +41,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
         vertical: AppSpacing.xs.h,
       ),
       decoration: BoxDecoration(
-        color: AppTextStyles.titleColor,
+        color: AppColors.surfaceMuted,
         borderRadius: BorderRadius.circular(AppRadius.large),
       ),
 
@@ -49,8 +52,8 @@ class _BottomNavBarState extends State<BottomNavBar> {
               icon: Icons.home,
               label: 'Home',
               isActive: navProvider.currentIndex == 0,
-              activeColor: activeColor,
-              inactiveColor: inactiveColor,
+              activeColor: AppColors.primary,
+              inactiveColor: AppColors.inactive,
               activeIconSize: activeIconSize,
               inactiveIconSize: inactiveIconSize,
               activeStyleText: activeStyleText,
@@ -64,8 +67,8 @@ class _BottomNavBarState extends State<BottomNavBar> {
               icon: Icons.book,
               label: 'Subjects',
               isActive: navProvider.currentIndex == 1,
-              activeColor: activeColor,
-              inactiveColor: inactiveColor,
+              activeColor: AppColors.primary,
+              inactiveColor: AppColors.inactive,
               activeIconSize: activeIconSize,
               inactiveIconSize: inactiveIconSize,
               activeStyleText: activeStyleText,
@@ -79,8 +82,8 @@ class _BottomNavBarState extends State<BottomNavBar> {
               icon: Icons.person,
               label: 'Profile',
               isActive: navProvider.currentIndex == 2,
-              activeColor: activeColor,
-              inactiveColor: inactiveColor,
+              activeColor: AppColors.primary,
+              inactiveColor: AppColors.inactive,
               activeIconSize: activeIconSize,
               inactiveIconSize: inactiveIconSize,
               activeStyleText: activeStyleText,
