@@ -8,6 +8,7 @@ abstract final class AppDimensions {
   // Controls
   static double get buttonHeight => 52.h;
   static double get inputHeight => 52.h;
+  static double get smallButtonWidth => 125.w;
 
   // Icons
   static double get iconSmall => 16.r;
@@ -26,4 +27,3 @@ abstract final class AppDimensions {
   static double get bottomNavHeight => 64.h;
   static double get appBarHeight => 56.h;
 }
-

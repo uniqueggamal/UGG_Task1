@@ -1,6 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:internship_task/core/constants/app_endpoints.dart';
+import 'package:internship_task/features/auth/models/login_request.dart';
+import 'package:internship_task/features/auth/models/register_model.dart';
+
 class AuthException implements Exception {
   final String message;
 
@@ -11,140 +15,129 @@ class AuthException implements Exception {
 }
 
 class AuthService {
-  static const String baseUrl = 'http://192.168.0.122:8000/api';
-  
-
   // =========================
-  // LOGIN
+  // COMMON HTTP REQUEST
   // =========================
 
-  Future<Map<String, dynamic>?> login({
-    required String email,
-    required String password,
+  Future<Map<String, dynamic>> _post({
+    required String url,
+    Map<String, dynamic>? body,
+    String? token,
   }) async {
     final client = HttpClient();
 
     try {
-      final request = await client.postUrl(
-        Uri.parse('$baseUrl/login'),
-      );
+      final request = await client.postUrl(Uri.parse(url));
 
       request.headers.contentType = ContentType.json;
-      request.headers.set(
-        HttpHeaders.acceptHeader,
-        'application/json',
-      );
+      request.headers.set(HttpHeaders.acceptHeader, 'application/json');
 
-      request.write(
-        jsonEncode({
-          'email': email,
-          'password': password,
-        }),
-      );
+      if (token != null) {
+        request.headers.set(HttpHeaders.authorizationHeader, 'Bearer $token');
+      }
+
+      if (body != null) {
+        request.write(jsonEncode(body));
+      }
 
       final response = await request.close();
-      final responseBody =
-          await response.transform(utf8.decoder).join();
+      final responseBody = await response.transform(utf8.decoder).join();
 
-      print('\nLogin status: ${response.statusCode}');
-      print('\nLogin response: $responseBody');
+      print('\nPOST: $url');
+      print('Status: ${response.statusCode}');
+      print('Response: $responseBody');
 
-      if (response.statusCode == 200) {
-        final data = jsonDecode(responseBody);
-
-        print('\nToken received: ${data['token']}');
-
-        return data;
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        return jsonDecode(responseBody);
       }
 
       if (response.statusCode == 401) {
-        throw AuthException('Invalid email or password.');
+        throw AuthException('Unauthorized request.');
       }
 
       if (response.statusCode == 422) {
-        throw AuthException(
-          'The submitted information is invalid.',
-        );
+        throw AuthException('The submitted information is invalid.');
       }
 
       if (response.statusCode >= 500) {
-        throw AuthException(
-          'Server error. Please try again later.',
-        );
+        throw AuthException('Server error. Please try again later.');
       }
 
       throw AuthException(
-        'Login failed. Status code: ${response.statusCode}',
+        'Request failed. Status code: ${response.statusCode}',
       );
     } on AuthException {
       rethrow;
     } on SocketException {
-      throw AuthException(
-        'Unable to connect to the server.',
-      );
+      throw AuthException('Unable to connect to the server.');
     } on FormatException {
-      throw AuthException(
-        'Invalid response received from the server.',
-      );
+      throw AuthException('Invalid response received from the server.');
     } finally {
       client.close();
     }
   }
 
+  // =========================
+  // LOGIN
+  // =========================
+
+  Future<Map<String, dynamic>> login({required LoginRequest model}) async {
+    final data = await _post(
+      url: ApiEndpoints.login,
+      body: {'email': model.email, 'password': model.password},
+    );
+
+    if (data['token'] == null) {
+      throw AuthException('Login token was not received.');
+    }
+
+    return data;
+  }
+
+  // =========================
+  // CHECK EMAIL
+  // =========================
+
+  Future<bool> checkEmail(String email) async {
+    final data = await _post(
+      url: ApiEndpoints.checkEmail,
+      body: {'email': email},
+    );
+
+    return data['exists'] == true;
+  }
+
+  // =========================
+  // REGISTER
+  // =========================
+
+  Future<Map<String, dynamic>> register({
+    required RegisterRequest model,
+  }) async {
+    final data = await _post(
+      url: ApiEndpoints.register,
+      body: {
+        'name': model.name,
+        'email': model.email,
+        'password': model.password,
+        'password_confirmation': model.password,
+      },
+    );
+
+    if (data['token'] == null) {
+      throw AuthException('Registration token was not received.');
+    }
+
+    return data;
+  }
 
   // =========================
   // LOGOUT
   // =========================
 
   Future<bool> logout(String token) async {
-    final client = HttpClient();
+    await _post(url: ApiEndpoints.logout, token: token);
 
-    try {
-      final request = await client.postUrl(
-        Uri.parse('$baseUrl/logout'),
-      );
-
-      request.headers.set(
-        HttpHeaders.contentTypeHeader,
-        'application/json',
-      );
-
-      request.headers.set(
-        HttpHeaders.acceptHeader,
-        'application/json',
-      );
-
-      request.headers.set(
-        HttpHeaders.authorizationHeader,
-        'Bearer $token',
-      );
-
-      final response = await request.close();
-      final responseBody =
-          await response.transform(utf8.decoder).join();
-
-      print('\nLogout status: ${response.statusCode}');
-      print('\nLogout response: $responseBody');
-
-      if (response.statusCode == 200) {
-        return true;
-      }
-
-      throw AuthException(
-        'Logout failed. Status code: ${response.statusCode}',
-      );
-    } on AuthException {
-      rethrow;
-    } on SocketException {
-      throw AuthException(
-        'Unable to connect to the server.',
-      );
-    } on FormatException {
-      throw AuthException(
-        'Invalid response received from the server.',
-      );
-    } finally {
-      client.close();
-    }
+    return true;
   }
 }

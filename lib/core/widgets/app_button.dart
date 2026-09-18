@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:internship_task/core/theme/app_colors.dart';
 import 'package:internship_task/core/theme/app_text_styles.dart';
 
@@ -8,8 +9,8 @@ class AppButton extends StatelessWidget {
   final String text;
   final bool isLoading;
   final VoidCallback? onPressed;
-  final double width;
-  final double height;
+  final double? width;
+  final double? height;
   final Color? backgroundColor;
   final Color? foregroundColor;
   final double elevation;
@@ -23,8 +24,8 @@ class AppButton extends StatelessWidget {
     required this.text,
     this.isLoading = false,
     this.onPressed,
-    this.width = double.infinity,
-    required this.height,
+    this.width,
+    this.height,
     this.backgroundColor,
     this.foregroundColor,
     this.elevation = 5,
@@ -49,6 +50,9 @@ class AppButton extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(borderRadius),
           ),
+          minimumSize: Size.zero,
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 0),
         ),
         child: isLoading
             ? (loadingIndicator ??
@@ -65,7 +69,7 @@ class AppButton extends StatelessWidget {
                 style:
                     textStyle ??
                     AppTextStyles.bodyLarge.copyWith(
-                      color: AppColors.onPrimary,
+                      color: foregroundColor ?? AppColors.onPrimary,
                       fontWeight: FontWeight.w700,
                     ),
               ),

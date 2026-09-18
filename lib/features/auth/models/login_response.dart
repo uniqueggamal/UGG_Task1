@@ -1,8 +1,8 @@
-import 'package:internship_task/features/auth/models/user_model.dart';
+import 'package:internship_task/features/user/models/user_profile_model.dart';
 
 class LoginResponse {
   final String message;
-  final UserModel user;
+  final UserProfileModel user;
   final String token;
 
   const LoginResponse({
@@ -14,7 +14,7 @@ class LoginResponse {
   factory LoginResponse.fromJson(Map<String, dynamic> json) {
     return LoginResponse(
       message: json['message'] as String? ?? '',
-      user: UserModel.fromJson(
+      user: UserProfileModel.fromJson(
         json['user'] as Map<String, dynamic>,
       ),
       token: json['token'] as String? ?? '',

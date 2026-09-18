@@ -1,32 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:internship_task/app/routes.dart';
+import 'package:internship_task/features/auth/models/login_request.dart';
+import 'package:internship_task/features/auth/models/register_model.dart';
+import 'package:provider/provider.dart';
+import 'dart:math' as math;
+
+import 'package:internship_task/core/constants/routes.dart';
+
 import 'package:internship_task/core/storage/preference_storage.dart';
+
 import 'package:internship_task/core/theme/app_dimensions.dart';
 import 'package:internship_task/core/theme/app_radius.dart';
+import 'package:internship_task/core/theme/app_spacing.dart';
+
 import 'package:internship_task/core/utils/validators.dart';
+
 import 'package:internship_task/core/widgets/app_button.dart';
 import 'package:internship_task/core/widgets/app_message.dart';
 import 'package:internship_task/core/widgets/cutom_textfield/custom_textfield.dart';
 import 'package:internship_task/core/widgets/cutom_textfield/models/custom_textfield_model.dart';
+
 import 'package:internship_task/features/auth/providers/auth_provider.dart';
-import 'package:internship_task/core/providers/nav_provider.dart';
-import 'package:internship_task/app/app_shell/base/screens/base_screen.dart';
 import 'package:internship_task/features/auth/services/auth_service.dart';
 import 'package:internship_task/features/auth/widgets/form_items/auth_header.dart';
-import 'package:internship_task/core/theme/app_spacing.dart';
-import 'package:internship_task/core/widgets/text_field.dart';
-import 'package:provider/provider.dart';
+
 import '../widgets/background_items/auth_background.dart';
 import '../widgets/form_items/auth_card.dart';
 import '../widgets/login_logo.dart';
-import '../widgets/form_items/iconed_text_field.dart';
 
-/// The main login screen responsible for:
-/// - Screen-level state (email, password, loading, errors)
-/// - Login flow coordination
-/// - Navigation
-/// - Connecting UI components together
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -35,19 +36,41 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final email = TextEditingController(text: "unique@gmail.com");
-  late var password = TextEditingController(text: "unique");
+  // ============================================================
+  // CONTROLLERS & FORM
+  // ============================================================
+
+  final email = TextEditingController(text: "unique11@gmail.com");
+  late var password = TextEditingController(text: "worldstar11");
+
   final _formKey = GlobalKey<FormState>();
+
+  // ============================================================
+  // FIELD STATES
+  // ============================================================
+
   FieldState emailState = FieldState.normal;
   String? emailMessage;
 
   FieldState passwordState = FieldState.normal;
   String? passwordMessage;
 
+  // ============================================================
+  // UI STATE
+  // ============================================================
+
   bool hidePassword = true;
   bool _isLoading = false;
 
+  // ============================================================
+  // SERVICES
+  // ============================================================
+
   PreferencesService save = PreferencesService();
+
+  // ============================================================
+  // LIFECYCLE
+  // ============================================================
 
   @override
   void dispose() {
@@ -56,32 +79,40 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void passwordDispose() {
-    password = TextEditingController(text: "");
-  }
+  // ============================================================
+  // LOGIN
+  // ============================================================
 
-  Future<void> _login(String email, String password) async {
-    _isLoading = true;
+  Future<void> _login(LoginRequest model) async {
+    setState(() {
+      _isLoading = true;
+    });
     try {
-      await context.read<AuthProvider>().login(
-        email: email,
-        password: password,
-      );
+      await context.read<AuthProvider>().login(model: model);
 
-      if (!context.mounted) return;
+      if (!mounted) return;
 
       AppMessage.show(
         context,
         message: 'Login successful',
         type: MessageType.success,
       );
+
       Navigator.pushNamed(context, AppRoutes.home);
     } on AuthException catch (e) {
-      if (!context.mounted) return;
+      if (!mounted) return;
+
       AppMessage.show(context, message: e.message, type: MessageType.error);
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
-    _isLoading = false;
   }
+
+  // ============================================================
+  // FIELD VALIDATION
+  // ============================================================
 
   void _validateEmail(String value) {
     final message = Validators.validateEmail(value);
@@ -92,11 +123,33 @@ class _LoginScreenState extends State<LoginScreen> {
     });
   }
 
+  void _validatePassword(String value) {
+    final message = Validators.validatePassword(value);
+
+    setState(() {
+      passwordMessage = message;
+      passwordState = message == null ? FieldState.normal : FieldState.error;
+    });
+  }
+
+  // ============================================================
+  // PASSWORD
+  // ============================================================
+
+  void passwordDispose() {
+    password = TextEditingController(text: "");
+  }
+
+  // ============================================================
+  // LOGIN FORM
+  // ============================================================
+
   Widget loginFormFields() {
     return Form(
       key: _formKey,
       child: Column(
         children: [
+          // -------------------- Email --------------------
           CustomTextField(
             model: CustomTextFieldModel(
               controller: email,
@@ -106,14 +159,15 @@ class _LoginScreenState extends State<LoginScreen> {
               keyboardType: TextInputType.emailAddress,
               textInputAction: TextInputAction.next,
               enabled: !_isLoading,
-
               state: emailState,
               message: emailMessage,
-
               onChanged: _validateEmail,
             ),
           ),
+
           30.h.verticalSpace,
+
+          // -------------------- Password --------------------
           CustomTextField(
             model: CustomTextFieldModel(
               inputDecoration: InputDecoration(),
@@ -125,6 +179,9 @@ class _LoginScreenState extends State<LoginScreen> {
               keyboardType: TextInputType.visiblePassword,
               textInputAction: TextInputAction.done,
               enabled: !_isLoading,
+              onChanged: _validatePassword,
+              state: passwordState,
+              message: passwordMessage,
               suffixIcon: IconButton(
                 onPressed: () {
                   setState(() {
@@ -139,15 +196,25 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
           ),
+
           30.h.verticalSpace,
+
+          // -------------------- Login Button --------------------
           AppButton(
             text: 'Login',
             height: AppDimensions.buttonHeight,
-            borderRadius: AppRadius.small,
+            width: double.infinity,
+            borderRadius: AppRadius.medium,
+            isLoading: _isLoading,
             onPressed: () {
+              final model = LoginRequest(
+                email: email.text,
+                password: password.text,
+              );
               if (_formKey.currentState!.validate()) {
-                _login(email.text, password.text);
+                _login(model);
               }
+
               passwordDispose();
             },
           ),
@@ -156,15 +223,20 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
+  // ============================================================
+  // LOGIN HEADER
+  // ============================================================
+
   Widget loginHeaderFields() {
     const loginTitle = "Welcome to";
     const loginSubtitle = "NCCS Internship";
+
     return Column(
       children: [
         Center(child: LoginLogo()),
+
         SizedBox(height: AppSpacing.xl.h),
 
-        // Header
         AuthHeader(
           title: loginTitle,
           subtitle: loginSubtitle,
@@ -176,11 +248,12 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
+  // ============================================================
+  // BUILD
+  // ============================================================
+
   @override
   Widget build(BuildContext context) {
-    final navProvider = context.watch<NavProvider>();
-    final authProvider = context.watch<AuthProvider>();
-
     return Scaffold(
       body: Stack(
         children: [
@@ -202,7 +275,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   child: ConstrainedBox(
                     constraints: BoxConstraints(
-                      minHeight: constraints.maxHeight - AppSpacing.xl.h,
+                      minHeight: math.max(
+                        0,
+                        constraints.maxHeight - AppSpacing.xl.h,
+                      ),
                     ),
                     child: Center(
                       child: ConstrainedBox(
@@ -216,7 +292,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           formFields: [loginFormFields()],
                           dividerText: 'or',
                           footerText: "Don't have an account? Create one",
-                          onFooterPressed: () {},
+                          onFooterPressed: () {
+                            Navigator.pushNamed(context, AppRoutes.register);
+                          },
                         ),
                       ),
                     ),

@@ -1,7 +1,10 @@
 import 'package:flutter/foundation.dart';
 
 import 'package:internship_task/core/storage/preference_storage.dart';
+import 'package:internship_task/features/auth/models/login_request.dart';
+import 'package:internship_task/features/auth/models/register_model.dart';
 import 'package:internship_task/features/auth/services/auth_service.dart';
+import 'package:internship_task/features/auth/services/user_service.dart';
 
 class AuthProvider extends ChangeNotifier {
   final AuthService _authService = AuthService();
@@ -25,12 +28,9 @@ class AuthProvider extends ChangeNotifier {
   // LOGIN
   // =========================
 
-  Future<void> login({required String email, required String password}) async {
-    _isLoading = true;
-    notifyListeners();
-
+  Future<void> login({required LoginRequest model}) async {
     try {
-      final data = await _authService.login(email: email, password: password);
+      final data = await _authService.login(model: model);
 
       if (data == null || data['token'] == null) {
         throw AuthException('Login failed.');
@@ -45,10 +45,7 @@ class AuthProvider extends ChangeNotifier {
       _authState = true;
 
       notifyListeners();
-    } finally {
-      _isLoading = false;
-      notifyListeners();
-    }
+    } catch (e) {}
   }
 
   // =========================
@@ -84,32 +81,24 @@ class AuthProvider extends ChangeNotifier {
     try {
       final storedToken = await _storage.getToken();
 
-      // No stored token
+      // No token stored → user is not logged in
       if (storedToken == null || storedToken.isEmpty) {
         _authState = false;
+        _token = null;
+        _user = null;
         return;
       }
 
-      if (storedToken != null) {
-        _authState = true;
-        return;
-      }
+      // Token exists → verify it with Laravel
+      final userService = UserService();
+      final user = await userService.getUser(storedToken);
 
-      // Check token against Laravel
-      // final user = await _authService.getUser(storedToken);
-
-      // if (user != null) {
-      //   _token = storedToken;
-      //   _user = user;
-      //   _authState = true;
-      // } else {
-      //   await _storage.clearAuth();
-
-      //   _token = null;
-      //   _user = null;
-      //   _authState = false;
-      // }
+      // If getUser() returns successfully, Laravel accepted the token
+      _token = storedToken;
+      _user = user;
+      _authState = true;
     } catch (_) {
+      // Token is invalid/revoked or request failed
       await _storage.clearAuth();
 
       _token = null;
@@ -119,5 +108,16 @@ class AuthProvider extends ChangeNotifier {
       _isCheckingAuth = false;
       notifyListeners();
     }
+  }
+
+  Future<void> registerUser(RegisterRequest model) async {
+    try {
+      final data = await _authService.register(model: model);
+
+
+      if (data[''] == null){
+
+      }
+    } catch (e) {}
   }
 }

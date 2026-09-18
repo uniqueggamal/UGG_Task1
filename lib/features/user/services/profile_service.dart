@@ -1,4 +1,4 @@
-import 'package:internship_task/features/profile/models/profile_model.dart';
+import 'package:internship_task/features/user/models/profile_model.dart';
 
 class ProfileService {
   Future<ProfileModel> getProfile() async {

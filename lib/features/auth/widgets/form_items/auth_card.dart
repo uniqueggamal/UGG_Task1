@@ -55,7 +55,6 @@ class AuthCard extends StatelessWidget {
           SizedBox(height: AppSpacing.xxl.h),
 
           // Button
-
           SizedBox(height: AppSpacing.xl.h),
 
           // Divider

@@ -4,7 +4,7 @@ import 'package:internship_task/core/theme/app_colors.dart';
 import 'package:internship_task/core/providers/sub_provider.dart';
 import 'package:internship_task/features/academics/screens/academic_details_screen.dart';
 import 'package:internship_task/features/home/screens/home_screen.dart';
-import 'package:internship_task/features/profile/screens/profile_screen.dart';
+import 'package:internship_task/features/user/screens/profile_screen.dart';
 import 'package:internship_task/app/app_shell/base/widgets/bottom_nav_bar.dart';
 import 'package:internship_task/app/app_shell/base/widgets/top_app_bar.dart';
 import 'package:provider/provider.dart';

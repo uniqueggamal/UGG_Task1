@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:internship_task/app/routes.dart';
+import 'package:internship_task/core/constants/routes.dart';
 import 'package:internship_task/core/widgets/app_message.dart';
 import 'package:internship_task/features/auth/providers/auth_provider.dart';
 import 'package:internship_task/core/providers/nav_provider.dart';
@@ -50,7 +50,7 @@ class TopAppBar extends StatelessWidget implements PreferredSizeWidget {
       ),
 
       actions: [
-        if (navProvider.currentIndex == 0 || navProvider.currentIndex == 2)
+        if (navProvider.currentIndex == 0)
           IconButton(
             onPressed: () {
               if (navProvider.currentIndex == 0) {
@@ -63,12 +63,7 @@ class TopAppBar extends StatelessWidget implements PreferredSizeWidget {
                 Navigator.pushNamed(context, AppRoutes.login);
               }
             },
-            icon: Icon(
-              navProvider.currentIndex == 0
-                  ? Icons.logout
-                  : Icons.mode_edit_outline,
-              size: 25.r,
-            ),
+            icon: Icon(Icons.logout, size: 25.r),
             color: AppColors.onPrimary,
           ),
       ],
