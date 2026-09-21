@@ -7,14 +7,14 @@ import 'package:internship_task/core/theme/app_spacing.dart';
 class ProfileInfoCard extends StatefulWidget {
   final IconData icon;
   final String title;
-  final String content;
+  final String? content;
   final int maxLines;
 
   const ProfileInfoCard({
     super.key,
     required this.icon,
     required this.title,
-    required this.content,
+    this.content,
     this.maxLines = 3,
   });
 
@@ -69,7 +69,9 @@ class _ProfileInfoCardState extends State<ProfileInfoCard> {
                   ),
 
                   Icon(
-                    Icons.mode_edit_outline,
+                    (widget.content == null || widget.content == "")
+                        ? Icons.add
+                        : Icons.mode_edit_outline,
                     size: 20.r,
                     color: AppColors.inactive,
                   ),
@@ -79,7 +81,7 @@ class _ProfileInfoCardState extends State<ProfileInfoCard> {
               AppSpacing.md.h.verticalSpace,
 
               Text(
-                widget.content,
+                widget.content ?? "",
                 maxLines: isExpanded ? null : widget.maxLines,
                 overflow: isExpanded
                     ? TextOverflow.visible

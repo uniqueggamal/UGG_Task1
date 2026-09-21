@@ -1,6 +1,6 @@
 class ApiEndpoints {
   // ==================== Base URL ====================
-  static const String baseUrl = 'http://192.168.0.106:8000/api';
+  static const String baseUrl = 'http://192.168.0.100:8000/api';
 
   // ==================== Authentication ====================
   static const String register = '$baseUrl/register';

@@ -212,10 +212,20 @@ class _LoginScreenState extends State<LoginScreen> {
                 password: password.text,
               );
               if (_formKey.currentState!.validate()) {
-                _login(model);
+                if (emailState == FieldState.normal &&
+                    passwordState == FieldState.normal) {
+                  _login(model);
+                } else {
+                  AppMessage.show(
+                    context,
+                    message: "Please fill in correct details",
+                    type: MessageType.error,
+                  );
+                  return;
+                }
               }
 
-              passwordDispose();
+              // passwordDispose();
             },
           ),
         ],

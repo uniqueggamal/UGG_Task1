@@ -1,5 +1,8 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:internship_task/features/user/providers/user_provider.dart';
+import 'package:internship_task/firebase_options.dart';
 import 'package:provider/provider.dart';
 
 import 'package:internship_task/core/constants/routes.dart';
@@ -11,6 +14,7 @@ import 'package:internship_task/features/auth/providers/auth_provider.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   final authProvider = AuthProvider();
 
   await authProvider.checkAuth();
@@ -21,6 +25,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => NavProvider()),
         ChangeNotifierProvider(create: (_) => SubProvider()),
         ChangeNotifierProvider.value(value: authProvider),
+        ChangeNotifierProvider(create: (_) => UserProvider()),
       ],
       child: const MyApp(),
     ),

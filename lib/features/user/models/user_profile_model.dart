@@ -1,6 +1,6 @@
 class UserProfileModel {
-  final int id;
-  final int userId;
+  final int? id;
+  final int? userId;
   final String? role;
   final String? currentStatus;
   final String? affiliatedOrganization;
@@ -13,8 +13,8 @@ class UserProfileModel {
   final String? updatedAt;
 
   const UserProfileModel({
-    required this.id,
-    required this.userId,
+    this.id,
+    this.userId,
     this.role,
     this.currentStatus,
     this.affiliatedOrganization,
@@ -29,8 +29,8 @@ class UserProfileModel {
 
   factory UserProfileModel.fromJson(Map<String, dynamic> json) {
     return UserProfileModel(
-      id: json['id'] as int,
-      userId: json['user_id'] as int,
+      id: json['id'] as int?,
+      userId: json['user_id'] as int?,
       role: json['role'] as String?,
       currentStatus: json['current_status'] as String?,
       affiliatedOrganization: json['affiliated_organization'] as String?,
@@ -42,5 +42,18 @@ class UserProfileModel {
       createdAt: json['created_at'] as String?,
       updatedAt: json['updated_at'] as String?,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'role': role,
+      'current_status': currentStatus,
+      'affiliated_organization': affiliatedOrganization,
+      'date_of_birth': dateOfBirth,
+      'phone': phone,
+      'description': description,
+      'location': location,
+      'profile_image': profileImage,
+    };
   }
 }

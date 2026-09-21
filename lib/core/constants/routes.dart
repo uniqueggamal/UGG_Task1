@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:internship_task/app/app_shell/base/screens/base_screen.dart';
 import 'package:internship_task/features/auth/screens/login_screen.dart';
 import 'package:internship_task/features/auth/screens/register_screen.dart';
+import 'package:internship_task/features/user/screens/initialize_screen.dart';
 import 'package:internship_task/features/user/screens/profile_screen.dart';
 import 'package:internship_task/features/academics/screens/academic_details_screen.dart';
 
@@ -12,6 +13,7 @@ class AppRoutes {
   static const String home = '/home';
   static const String profile = '/profile';
   static const String academics = '/academics';
+  static const String initialize = '/initialize';
 
   // Route map
   static Map<String, WidgetBuilder> routes = {
@@ -20,5 +22,6 @@ class AppRoutes {
     home: (context) => const BaseScreen(),
     profile: (context) => const ProfileScreen(),
     academics: (context) => const AcademicDetailsScreen(),
+    initialize: (context) => const InitializeScreen(),
   };
 }

@@ -5,13 +5,14 @@ import 'package:internship_task/core/widgets/app_message.dart';
 import 'package:internship_task/features/auth/providers/auth_provider.dart';
 import 'package:internship_task/core/providers/nav_provider.dart';
 import 'package:internship_task/core/providers/sub_provider.dart';
-import 'package:internship_task/features/auth/screens/login_screen.dart';
 import 'package:internship_task/core/theme/app_colors.dart';
 import 'package:internship_task/core/theme/app_text_styles.dart';
 import 'package:provider/provider.dart';
 
 class TopAppBar extends StatelessWidget implements PreferredSizeWidget {
-  const TopAppBar({super.key});
+  final String? appTitle;
+  final bool needsinitialize;
+  const TopAppBar({super.key, this.appTitle, this.needsinitialize = false});
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight + 8.0);
 
@@ -21,7 +22,9 @@ class TopAppBar extends StatelessWidget implements PreferredSizeWidget {
     final subProvider = context.watch<SubProvider>();
     final authProvider = context.watch<AuthProvider>();
 
-    final title = navProvider.currentIndex == 0
+    final title = needsinitialize
+        ? subProvider.subIndex
+        : navProvider.currentIndex == 0
         ? "Dashboard"
         : navProvider.currentIndex == 1
         ? subProvider.subIndex
@@ -53,7 +56,7 @@ class TopAppBar extends StatelessWidget implements PreferredSizeWidget {
         if (navProvider.currentIndex == 0)
           IconButton(
             onPressed: () {
-              if (navProvider.currentIndex == 0) {
+              if (navProvider.currentIndex == 0 && !needsinitialize) {
                 authProvider.logout();
                 AppMessage.show(
                   context,

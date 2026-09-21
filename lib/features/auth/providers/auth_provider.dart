@@ -4,7 +4,16 @@ import 'package:internship_task/core/storage/preference_storage.dart';
 import 'package:internship_task/features/auth/models/login_request.dart';
 import 'package:internship_task/features/auth/models/register_model.dart';
 import 'package:internship_task/features/auth/services/auth_service.dart';
-import 'package:internship_task/features/auth/services/user_service.dart';
+import 'package:internship_task/features/user/services/user_service.dart';
+
+class _AuthException implements Exception {
+  final String message;
+
+  _AuthException(this.message);
+
+  @override
+  String toString() => message;
+}
 
 class AuthProvider extends ChangeNotifier {
   final AuthService _authService = AuthService();
@@ -14,7 +23,7 @@ class AuthProvider extends ChangeNotifier {
   String? _token;
   Map<String, dynamic>? _user;
 
-  bool _isLoading = false;
+  final bool _isLoading = false;
   bool _isCheckingAuth = true;
 
   bool get authState => _authState;
@@ -27,27 +36,21 @@ class AuthProvider extends ChangeNotifier {
   // =========================
   // LOGIN
   // =========================
-
   Future<void> login({required LoginRequest model}) async {
-    try {
-      final data = await _authService.login(model: model);
+    final data = await _authService.login(model: model);
 
-      if (data == null || data['token'] == null) {
-        throw AuthException('Login failed.');
-      }
+    if (data['token'] == null) {
+      throw _AuthException('Login failed.');
+    }
 
-      _token = data['token'];
+    _token = data['token'];
 
-      await _storage.saveAuth(token: _token!);
+    await _storage.saveAuth(token: _token!);
 
-      print('token: $_token');
+    _authState = true;
 
-      _authState = true;
-
-      notifyListeners();
-    } catch (e) {}
+    notifyListeners();
   }
-
   // =========================
   // LOGOUT
   // =========================
@@ -111,13 +114,10 @@ class AuthProvider extends ChangeNotifier {
   }
 
   Future<void> registerUser(RegisterRequest model) async {
-    try {
-      final data = await _authService.register(model: model);
+    final data = await _authService.register(model: model);
 
-
-      if (data[''] == null){
-
-      }
-    } catch (e) {}
+    if (data['token'] == null) {
+      throw _AuthException('Registration failed.');
+    }
   }
 }
