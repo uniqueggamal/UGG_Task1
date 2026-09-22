@@ -50,4 +50,7 @@ class ApiEndpoints {
 
   // ==================== Check-Email ====================
   static String checkEmail = '$baseUrl/check-email';
+
+  // ==================== FCM-token ====================
+  static String fcmToken = '$baseUrl/fcm-token';
 }

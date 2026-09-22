@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:internship_task/core/theme/app_text_styles.dart';
+
 import 'package:internship_task/core/theme/app_spacing.dart';
+import 'package:internship_task/core/theme/app_text_styles.dart';
 
 class InfoRowsSection extends StatelessWidget {
-  const InfoRowsSection({super.key});
+  const InfoRowsSection({
+    super.key,
+    required this.values,
+  });
+
+  final List<({String label, String? value})> values;
 
   @override
   Widget build(BuildContext context) {
@@ -13,15 +19,17 @@ class InfoRowsSection extends StatelessWidget {
         AppSpacing.xxxl.w,
         AppSpacing.xxxl.h,
         AppSpacing.xxxl.w,
-        AppSpacing.xxxl.r,
+        AppSpacing.xxxl.h,
       ),
       child: Column(
-        children: [
-          _InfoRow(label: "ID", value: "NCCSINTERN1234"),
-          _InfoRow(label: "DOB", value: "2000-01-01"),
-          _InfoRow(label: "Phone", value: "9876543210"),
-          _InfoRow(label: "Email", value: "uniquegamal@gmail.com"),
-        ],
+        children: values
+            .map(
+              (item) => _InfoRow(
+                label: item.label,
+                value: item.value,
+              ),
+            )
+            .toList(),
       ),
     );
   }
@@ -29,9 +37,12 @@ class InfoRowsSection extends StatelessWidget {
 
 class _InfoRow extends StatelessWidget {
   final String label;
-  final String value;
+  final String? value;
 
-  const _InfoRow({required this.label, required this.value});
+  const _InfoRow({
+    required this.label,
+    required this.value,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -39,14 +50,19 @@ class _InfoRow extends StatelessWidget {
       children: [
         Row(
           crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             SizedBox(
               width: MediaQuery.sizeOf(context).width * 0.20,
-              child: Text(label, style: AppTextStyles.titleMedium),
+              child: Text(
+                label,
+                style: AppTextStyles.titleMedium,
+              ),
             ),
             Expanded(
-              child: Text(":\t\t\t" + value, style: AppTextStyles.bodyMedium),
+              child: Text(
+                ':   ${value?.isNotEmpty == true ? value : 'Not provided'}',
+                style: AppTextStyles.bodyMedium,
+              ),
             ),
           ],
         ),

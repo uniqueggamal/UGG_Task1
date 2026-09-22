@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:internship_task/core/theme/app_spacing.dart';
+import 'package:internship_task/core/widgets/cutom_textfield/custom_textfield.dart';
+import 'package:internship_task/core/widgets/cutom_textfield/models/custom_textfield_model.dart';
 import 'package:internship_task/features/user/widgets/initialization/initialization_dropdown.dart';
-import 'package:internship_task/features/user/widgets/initialization/initialization_field.dart';
 
 class AcademicInformationStep extends StatelessWidget {
   const AcademicInformationStep({
@@ -28,53 +30,89 @@ class AcademicInformationStep extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'Tell us about your current role and academic status.',
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            color: Theme.of(context).colorScheme.onSurfaceVariant,
+          style: textTheme.bodyMedium?.copyWith(
+            color: colorScheme.onSurfaceVariant,
           ),
         ),
 
         SizedBox(height: AppSpacing.lg.h),
 
+        // --------------------------------------------------
+        // Role
+        // --------------------------------------------------
         _buildRoleField(),
 
         if (selectedRole == 'Other') ...[
           SizedBox(height: AppSpacing.md.h),
 
-          InitializationField(
-            label: 'Please specify your role',
-            hint: 'e.g. Researcher, Freelancer...',
-            controller: customRoleController,
+          _buildFieldLabel(context, 'Please specify your role'),
+
+          SizedBox(height: AppSpacing.sm.h),
+
+          CustomTextField(
+            model: CustomTextFieldModel(
+              controller: customRoleController,
+              hintText: 'e.g. Researcher, Freelancer...',
+              textInputAction: TextInputAction.next,
+            ),
           ),
         ],
 
         SizedBox(height: AppSpacing.md.h),
 
+        // --------------------------------------------------
+        // Current Status
+        // --------------------------------------------------
         _buildStatusField(),
 
         if (selectedStatus == 'Other') ...[
           SizedBox(height: AppSpacing.md.h),
 
-          InitializationField(
-            label: 'Please specify your status',
-            hint: 'Type your status here',
-            controller: customStatusController,
+          _buildFieldLabel(context, 'Please specify your status'),
+
+          SizedBox(height: AppSpacing.sm.h),
+
+          CustomTextField(
+            model: CustomTextFieldModel(
+              controller: customStatusController,
+              hintText: 'Type your status here',
+              textInputAction: TextInputAction.next,
+            ),
           ),
         ],
 
         SizedBox(height: AppSpacing.md.h),
 
-        InitializationField(
-          label: 'Affiliated Organization',
-          hint: 'NCCS',
-          controller: organizationController,
+        // --------------------------------------------------
+        // Affiliated Organization
+        // --------------------------------------------------
+        _buildFieldLabel(context, 'Affiliated Organization'),
+
+        SizedBox(height: AppSpacing.sm.h),
+
+        CustomTextField(
+          model: CustomTextFieldModel(
+            controller: organizationController,
+            hintText: 'NCCS',
+            textInputAction: TextInputAction.done,
+          ),
         ),
       ],
     );
+  }
+
+  Widget _buildFieldLabel(BuildContext context, String label) {
+    final theme = Theme.of(context);
+
+    return Text(label, style: theme.textTheme.labelLarge);
   }
 
   Widget _buildRoleField() {

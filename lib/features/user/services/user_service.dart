@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:internship_task/core/constants/app_endpoints.dart';
 import 'package:internship_task/features/user/models/full_profile_model.dart';
+import 'package:internship_task/features/user/models/user_model.dart';
 import 'package:internship_task/features/user/models/user_profile_model.dart';
 
 // ============================================================
@@ -23,6 +24,10 @@ class UserException implements Exception {
 // ============================================================
 
 class UserService {
+  // ==========================================================
+  // CURRENT USER
+  // ==========================================================
+
   // ----------------------------------------------------------
   // GET CURRENT USER
   // ----------------------------------------------------------
@@ -30,6 +35,26 @@ class UserService {
   Future<Map<String, dynamic>> getUser(String token) async {
     return _request(method: 'GET', url: ApiEndpoints.user, token: token);
   }
+
+  // ----------------------------------------------------------
+  // UPDATE CURRENT USER
+  // ----------------------------------------------------------
+
+  Future<Map<String, dynamic>> updateUser({
+    required String token,
+    required UserModel user,
+  }) async {
+    return _request(
+      method: 'PUT',
+      url: ApiEndpoints.user,
+      token: token,
+      body: {'name': user.name},
+    );
+  }
+
+  // ==========================================================
+  // FULL PROFILE
+  // ==========================================================
 
   // ----------------------------------------------------------
   // GET FULL PROFILE
@@ -57,13 +82,377 @@ class UserService {
 
   Future<Map<String, dynamic>> updateProfile({
     required String token,
-    required UserProfileModel model,
+    required UserProfileModel profile,
   }) async {
     return _request(
       method: 'PUT',
       url: ApiEndpoints.fullProfile,
       token: token,
-      body: model.toJson(),
+      body: profile.toJson(),
+    );
+  }
+
+  // ==========================================================
+  // ACADEMIC QUALIFICATIONS
+  // ==========================================================
+
+  // ----------------------------------------------------------
+  // CREATE
+  // ----------------------------------------------------------
+
+  Future<Map<String, dynamic>> createAcademicQualification({
+    required String token,
+    required Map<String, dynamic> data,
+  }) async {
+    return _request(
+      method: 'POST',
+      url: ApiEndpoints.academicQualifications,
+      token: token,
+      body: data,
+    );
+  }
+
+  // ----------------------------------------------------------
+  // UPDATE
+  // ----------------------------------------------------------
+
+  Future<Map<String, dynamic>> updateAcademicQualification({
+    required String token,
+    required int id,
+    required Map<String, dynamic> data,
+  }) async {
+    return _request(
+      method: 'PUT',
+      url: '${ApiEndpoints.academicQualifications}/$id',
+      token: token,
+      body: data,
+    );
+  }
+
+  // ----------------------------------------------------------
+  // DELETE
+  // ----------------------------------------------------------
+
+  Future<Map<String, dynamic>> deleteAcademicQualification({
+    required String token,
+    required int id,
+  }) async {
+    return _request(
+      method: 'DELETE',
+      url: '${ApiEndpoints.academicQualifications}/$id',
+      token: token,
+    );
+  }
+
+  // ==========================================================
+  // EXPERIENCES
+  // ==========================================================
+
+  // ----------------------------------------------------------
+  // CREATE
+  // ----------------------------------------------------------
+
+  Future<Map<String, dynamic>> createExperience({
+    required String token,
+    required Map<String, dynamic> data,
+  }) async {
+    return _request(
+      method: 'POST',
+      url: ApiEndpoints.experiences,
+      token: token,
+      body: data,
+    );
+  }
+
+  // ----------------------------------------------------------
+  // UPDATE
+  // ----------------------------------------------------------
+
+  Future<Map<String, dynamic>> updateExperience({
+    required String token,
+    required int id,
+    required Map<String, dynamic> data,
+  }) async {
+    return _request(
+      method: 'PUT',
+      url: '${ApiEndpoints.experiences}/$id',
+      token: token,
+      body: data,
+    );
+  }
+
+  // ----------------------------------------------------------
+  // DELETE
+  // ----------------------------------------------------------
+
+  Future<Map<String, dynamic>> deleteExperience({
+    required String token,
+    required int id,
+  }) async {
+    return _request(
+      method: 'DELETE',
+      url: '${ApiEndpoints.experiences}/$id',
+      token: token,
+    );
+  }
+
+  // ==========================================================
+  // SKILLS
+  // ==========================================================
+
+  // ----------------------------------------------------------
+  // CREATE
+  // ----------------------------------------------------------
+
+  Future<Map<String, dynamic>> createSkill({
+    required String token,
+    required Map<String, dynamic> data,
+  }) async {
+    return _request(
+      method: 'POST',
+      url: ApiEndpoints.skills,
+      token: token,
+      body: data,
+    );
+  }
+
+  // ----------------------------------------------------------
+  // UPDATE
+  // ----------------------------------------------------------
+
+  Future<Map<String, dynamic>> updateSkill({
+    required String token,
+    required int id,
+    required Map<String, dynamic> data,
+  }) async {
+    return _request(
+      method: 'PUT',
+      url: '${ApiEndpoints.skills}/$id',
+      token: token,
+      body: data,
+    );
+  }
+
+  // ----------------------------------------------------------
+  // DELETE
+  // ----------------------------------------------------------
+
+  Future<Map<String, dynamic>> deleteSkill({
+    required String token,
+    required int id,
+  }) async {
+    return _request(
+      method: 'DELETE',
+      url: '${ApiEndpoints.skills}/$id',
+      token: token,
+    );
+  }
+
+  // ==========================================================
+  // PROJECTS
+  // ==========================================================
+
+  // ----------------------------------------------------------
+  // CREATE
+  // ----------------------------------------------------------
+
+  Future<Map<String, dynamic>> createProject({
+    required String token,
+    required Map<String, dynamic> data,
+  }) async {
+    return _request(
+      method: 'POST',
+      url: ApiEndpoints.projects,
+      token: token,
+      body: data,
+    );
+  }
+
+  // ----------------------------------------------------------
+  // UPDATE
+  // ----------------------------------------------------------
+
+  Future<Map<String, dynamic>> updateProject({
+    required String token,
+    required int id,
+    required Map<String, dynamic> data,
+  }) async {
+    return _request(
+      method: 'PUT',
+      url: '${ApiEndpoints.projects}/$id',
+      token: token,
+      body: data,
+    );
+  }
+
+  // ----------------------------------------------------------
+  // DELETE
+  // ----------------------------------------------------------
+
+  Future<Map<String, dynamic>> deleteProject({
+    required String token,
+    required int id,
+  }) async {
+    return _request(
+      method: 'DELETE',
+      url: '${ApiEndpoints.projects}/$id',
+      token: token,
+    );
+  }
+
+  // ==========================================================
+  // ACHIEVEMENTS
+  // ==========================================================
+
+  // ----------------------------------------------------------
+  // CREATE
+  // ----------------------------------------------------------
+
+  Future<Map<String, dynamic>> createAchievement({
+    required String token,
+    required Map<String, dynamic> data,
+  }) async {
+    return _request(
+      method: 'POST',
+      url: ApiEndpoints.achievements,
+      token: token,
+      body: data,
+    );
+  }
+
+  // ----------------------------------------------------------
+  // UPDATE
+  // ----------------------------------------------------------
+
+  Future<Map<String, dynamic>> updateAchievement({
+    required String token,
+    required int id,
+    required Map<String, dynamic> data,
+  }) async {
+    return _request(
+      method: 'PUT',
+      url: '${ApiEndpoints.achievements}/$id',
+      token: token,
+      body: data,
+    );
+  }
+
+  // ----------------------------------------------------------
+  // DELETE
+  // ----------------------------------------------------------
+
+  Future<Map<String, dynamic>> deleteAchievement({
+    required String token,
+    required int id,
+  }) async {
+    return _request(
+      method: 'DELETE',
+      url: '${ApiEndpoints.achievements}/$id',
+      token: token,
+    );
+  }
+
+  // ==========================================================
+  // COURSEWORKS
+  // ==========================================================
+
+  // ----------------------------------------------------------
+  // CREATE
+  // ----------------------------------------------------------
+
+  Future<Map<String, dynamic>> createCoursework({
+    required String token,
+    required Map<String, dynamic> data,
+  }) async {
+    return _request(
+      method: 'POST',
+      url: ApiEndpoints.courseworks,
+      token: token,
+      body: data,
+    );
+  }
+
+  // ----------------------------------------------------------
+  // UPDATE
+  // ----------------------------------------------------------
+
+  Future<Map<String, dynamic>> updateCoursework({
+    required String token,
+    required int id,
+    required Map<String, dynamic> data,
+  }) async {
+    return _request(
+      method: 'PUT',
+      url: '${ApiEndpoints.courseworks}/$id',
+      token: token,
+      body: data,
+    );
+  }
+
+  // ----------------------------------------------------------
+  // DELETE
+  // ----------------------------------------------------------
+
+  Future<Map<String, dynamic>> deleteCoursework({
+    required String token,
+    required int id,
+  }) async {
+    return _request(
+      method: 'DELETE',
+      url: '${ApiEndpoints.courseworks}/$id',
+      token: token,
+    );
+  }
+
+  // ==========================================================
+  // INTERESTS
+  // ==========================================================
+
+  // ----------------------------------------------------------
+  // CREATE
+  // ----------------------------------------------------------
+
+  Future<Map<String, dynamic>> createInterest({
+    required String token,
+    required Map<String, dynamic> data,
+  }) async {
+    return _request(
+      method: 'POST',
+      url: ApiEndpoints.interests,
+      token: token,
+      body: data,
+    );
+  }
+
+  // ----------------------------------------------------------
+  // UPDATE
+  // ----------------------------------------------------------
+
+  Future<Map<String, dynamic>> updateInterest({
+    required String token,
+    required int id,
+    required Map<String, dynamic> data,
+  }) async {
+    return _request(
+      method: 'PUT',
+      url: '${ApiEndpoints.interests}/$id',
+      token: token,
+      body: data,
+    );
+  }
+
+  // ----------------------------------------------------------
+  // DELETE
+  // ----------------------------------------------------------
+
+  Future<Map<String, dynamic>> deleteInterest({
+    required String token,
+    required int id,
+  }) async {
+    return _request(
+      method: 'DELETE',
+      url: '${ApiEndpoints.interests}/$id',
+      token: token,
     );
   }
 
@@ -87,12 +476,12 @@ class UserService {
       );
 
       // --------------------------------------------------------
-      // Headers
+      // HEADERS
       // --------------------------------------------------------
 
       request.headers.set(HttpHeaders.acceptHeader, 'application/json');
 
-      if (token != null) {
+      if (token != null && token.isNotEmpty) {
         request.headers.set(HttpHeaders.authorizationHeader, 'Bearer $token');
       }
 
@@ -101,7 +490,7 @@ class UserService {
       }
 
       // --------------------------------------------------------
-      // Body
+      // BODY
       // --------------------------------------------------------
 
       if (body != null) {
@@ -109,13 +498,13 @@ class UserService {
       }
 
       // --------------------------------------------------------
-      // Send request
+      // SEND REQUEST
       // --------------------------------------------------------
 
       final response = await request.close();
 
       // --------------------------------------------------------
-      // Read response
+      // READ RESPONSE
       // --------------------------------------------------------
 
       final responseBody = await response.transform(utf8.decoder).join();
@@ -125,7 +514,7 @@ class UserService {
       print('Response: $responseBody');
 
       // --------------------------------------------------------
-      // Handle response
+      // HANDLE RESPONSE
       // --------------------------------------------------------
 
       return _handleResponse(
@@ -158,11 +547,11 @@ class UserService {
       case 'GET':
         return client.getUrl(uri);
 
-      case 'PUT':
-        return client.putUrl(uri);
-
       case 'POST':
         return client.postUrl(uri);
+
+      case 'PUT':
+        return client.putUrl(uri);
 
       case 'DELETE':
         return client.deleteUrl(uri);
@@ -181,12 +570,31 @@ class UserService {
     required String responseBody,
   }) {
     if (statusCode >= 200 && statusCode < 300) {
-      return jsonDecode(responseBody) as Map<String, dynamic>;
+      // Some DELETE endpoints may return an empty body.
+      if (responseBody.trim().isEmpty) {
+        return {'success': true};
+      }
+
+      final decoded = jsonDecode(responseBody);
+
+      if (decoded is Map<String, dynamic>) {
+        return decoded;
+      }
+
+      throw UserException('Invalid response format received from the server.');
     }
 
     switch (statusCode) {
       case 401:
         throw UserException('Unauthorized. Please login again.');
+
+      case 403:
+        throw UserException(
+          'You do not have permission to perform this action.',
+        );
+
+      case 404:
+        throw UserException('The requested resource was not found.');
 
       case 422:
         throw UserException('The submitted information is invalid.');

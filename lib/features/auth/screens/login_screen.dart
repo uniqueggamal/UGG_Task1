@@ -98,7 +98,7 @@ class _LoginScreenState extends State<LoginScreen> {
         type: MessageType.success,
       );
 
-      Navigator.pushNamed(context, AppRoutes.home);
+      Navigator.pushReplacementNamed(context, AppRoutes.home);
     } on AuthException catch (e) {
       if (!mounted) return;
 

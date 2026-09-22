@@ -4,6 +4,7 @@ import 'package:internship_task/core/storage/preference_storage.dart';
 import 'package:internship_task/features/auth/models/login_request.dart';
 import 'package:internship_task/features/auth/models/register_model.dart';
 import 'package:internship_task/features/auth/services/auth_service.dart';
+import 'package:internship_task/features/auth/services/notification_services.dart';
 import 'package:internship_task/features/user/services/user_service.dart';
 
 class _AuthException implements Exception {
@@ -18,6 +19,7 @@ class _AuthException implements Exception {
 class AuthProvider extends ChangeNotifier {
   final AuthService _authService = AuthService();
   final PreferencesService _storage = PreferencesService();
+  final NotificationService _notificationService = NotificationService();
 
   bool _authState = false;
   String? _token;
@@ -36,6 +38,7 @@ class AuthProvider extends ChangeNotifier {
   // =========================
   // LOGIN
   // =========================
+
   Future<void> login({required LoginRequest model}) async {
     final data = await _authService.login(model: model);
 
@@ -50,7 +53,43 @@ class AuthProvider extends ChangeNotifier {
     _authState = true;
 
     notifyListeners();
+
+    // Register FCM token after successful authentication.
+    await _registerFcmToken();
   }
+
+  // =========================
+  // REGISTER FCM TOKEN
+  // =========================
+
+  Future<void> _registerFcmToken() async {
+    // Cannot register an FCM token without
+    // an authenticated Laravel user.
+    if (_token == null || _token!.isEmpty) {
+      return;
+    }
+
+    try {
+      final fcmToken = await _notificationService.getFcmToken();
+
+      if (fcmToken == null || fcmToken.isEmpty) {
+        debugPrint('FCM token is unavailable.');
+        return;
+      }
+
+      await _notificationService.registerFcmToken(
+        fcmToken: fcmToken,
+        sanctumToken: _token!,
+      );
+
+      debugPrint('FCM token registered with Laravel.');
+    } catch (e) {
+      // FCM registration failure should not make
+      // an otherwise successful login fail.
+      debugPrint('Failed to register FCM token: $e');
+    }
+  }
+
   // =========================
   // LOGOUT
   // =========================
@@ -66,8 +105,9 @@ class AuthProvider extends ChangeNotifier {
       _authState = false;
 
       await _storage.clearAuth();
+
       final storedToken = await _storage.getToken();
-      print(storedToken);
+      debugPrint('Stored auth token after logout: $storedToken');
 
       notifyListeners();
     }
@@ -84,7 +124,7 @@ class AuthProvider extends ChangeNotifier {
     try {
       final storedToken = await _storage.getToken();
 
-      // No token stored → user is not logged in
+      // No token stored → user is not logged in.
       if (storedToken == null || storedToken.isEmpty) {
         _authState = false;
         _token = null;
@@ -92,16 +132,20 @@ class AuthProvider extends ChangeNotifier {
         return;
       }
 
-      // Token exists → verify it with Laravel
+      // Token exists → verify it with Laravel.
       final userService = UserService();
       final user = await userService.getUser(storedToken);
 
-      // If getUser() returns successfully, Laravel accepted the token
+      // Laravel accepted the stored Sanctum token.
       _token = storedToken;
       _user = user;
       _authState = true;
+
+      // Session is valid, so register the current
+      // FCM token as well.
+      await _registerFcmToken();
     } catch (_) {
-      // Token is invalid/revoked or request failed
+      // Token is invalid/revoked or request failed.
       await _storage.clearAuth();
 
       _token = null;
@@ -112,6 +156,10 @@ class AuthProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  // =========================
+  // REGISTER USER
+  // =========================
 
   Future<void> registerUser(RegisterRequest model) async {
     final data = await _authService.register(model: model);

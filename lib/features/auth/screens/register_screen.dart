@@ -2,13 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:internship_task/core/constants/routes.dart';
 import 'package:internship_task/core/theme/app_colors.dart';
-
 import 'package:internship_task/core/theme/app_dimensions.dart';
 import 'package:internship_task/core/theme/app_radius.dart';
 import 'package:internship_task/core/theme/app_spacing.dart';
-
 import 'package:internship_task/core/utils/validators.dart';
-
 import 'package:internship_task/core/widgets/app_button.dart';
 import 'package:internship_task/core/widgets/app_message.dart';
 import 'package:internship_task/core/widgets/cutom_textfield/custom_textfield.dart';
@@ -18,9 +15,18 @@ import 'package:internship_task/features/auth/providers/auth_provider.dart';
 import 'package:internship_task/features/auth/services/auth_service.dart';
 import 'package:internship_task/features/auth/widgets/background_items/auth_background.dart';
 import 'package:internship_task/features/auth/widgets/form_items/auth_card.dart';
-
 import 'package:internship_task/features/auth/widgets/form_items/auth_header.dart';
 import 'package:provider/provider.dart';
+
+enum EmailStatus {
+  empty,
+  invalid,
+  validNotChecked,
+  checking,
+  available,
+  registered,
+  error,
+}
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -34,12 +40,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
   // CONTROLLERS & FORM
   // ============================================================
 
-  final _fName = TextEditingController();
-  final _mName = TextEditingController();
-  final _lName = TextEditingController();
-  final _email = TextEditingController();
-  final _nPassword = TextEditingController();
-  final _cPassword = TextEditingController();
+  final _nameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _newPasswordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
 
   final _formKey = GlobalKey<FormState>();
 
@@ -49,34 +53,36 @@ class _RegisterScreenState extends State<RegisterScreen> {
   // FIELD STATES
   // ============================================================
 
-  FieldState _fNameState = FieldState.normal;
-  String? _fNameMessage;
-
-  FieldState _mNameState = FieldState.normal;
-  String? _mNameMessage;
-
-  FieldState _lNameState = FieldState.normal;
-  String? _lNameMessage;
+  FieldState _nameState = FieldState.normal;
+  String? _nameMessage;
 
   FieldState _emailState = FieldState.normal;
   String? _emailMessage;
 
-  FieldState _nPasswordState = FieldState.normal;
-  String? _nPasswordMessage;
+  FieldState _newPasswordState = FieldState.normal;
+  String? _newPasswordMessage;
 
-  FieldState _cPasswordState = FieldState.normal;
-  String? _cPasswordMessage;
+  FieldState _confirmPasswordState = FieldState.normal;
+  String? _confirmPasswordMessage;
+
+  // ============================================================
+  // EMAIL STATE
+  // ============================================================
+
+  EmailStatus _emailStatus = EmailStatus.empty;
+  bool _checkingEmail = false;
 
   // ============================================================
   // UI STATE
   // ============================================================
 
   bool _isLoading = false;
-  bool _cObscure = true;
-  bool _nObscure = true;
 
-  static const registerTitle = "Register";
-  static const registerSubtitle = "Your account Now!";
+  bool _confirmPasswordObscure = true;
+  bool _newPasswordObscure = true;
+
+  static const registerTitle = 'Register';
+  static const registerSubtitle = 'Create your account';
 
   // ============================================================
   // PAGE COUNTER
@@ -85,88 +91,270 @@ class _RegisterScreenState extends State<RegisterScreen> {
   int _counter = 1;
 
   void _addCount() {
-    setState(() {
-      _counter++;
-    });
-  }
-
-  void _subCount() {
-    setState(() {
-      _counter--;
-    });
-  }
-
-  // ============================================================
-  // FIELD VALIDATION
-  // ============================================================
-
-  void _validateFName(String value) {
-    final message = Validators.validateName(value);
-
-    setState(() {
-      _fNameMessage = message;
-      _fNameState = message == null ? FieldState.normal : FieldState.error;
-    });
-  }
-
-  void _validateMName(String value) {
-    final message = Validators.validateMiddleName(value);
-
-    setState(() {
-      _mNameMessage = message;
-      _mNameState = message == null ? FieldState.normal : FieldState.error;
-    });
-  }
-
-  void _validateLName(String value) {
-    final message = Validators.validateName(value);
-
-    setState(() {
-      _lNameMessage = message;
-      _lNameState = message == null ? FieldState.normal : FieldState.error;
-    });
-  }
-
-  void _validateEmail(String value) {
-    final message = Validators.validateEmail(value);
-
-    setState(() {
-      _emailMessage = message;
-      _emailState = message == null ? FieldState.normal : FieldState.error;
-    });
-  }
-
-  void _validatePassword(String value) {
-    final message = Validators.validatePassword(value);
-
-    setState(() {
-      _nPasswordMessage = message;
-      _nPasswordState = message == null ? FieldState.normal : FieldState.error;
-    });
-
-    // Re-check confirm password if it already has a value.
-    if (_cPassword.text.isNotEmpty) {
-      _validateCPassword(_cPassword.text);
+    if (_counter < 2) {
+      setState(() {
+        _counter++;
+      });
     }
   }
 
-  void _validateCPassword(String value) {
-    final message = Validators.validatePassword(value);
-    final passwordsMatch = _cPassword.text == _nPassword.text;
+  void _subCount() {
+    if (_counter > 1) {
+      setState(() {
+        _counter--;
+      });
+    }
+  }
+
+  // ============================================================
+  // NAME VALIDATION
+  // ============================================================
+
+  void _validateName(String value) {
+    final formattedName = Validators.capitalizeWords(value);
+
+    if (formattedName != value) {
+      _nameController.value = _nameController.value.copyWith(
+        text: formattedName,
+        selection: TextSelection.collapsed(offset: formattedName.length),
+      );
+    }
+
+    final message = Validators.validateName(formattedName);
+
+    setState(() {
+      _nameMessage = message;
+      _nameState = message == null ? FieldState.normal : FieldState.error;
+    });
+  }
+
+  // ============================================================
+  // EMAIL VALIDATION
+  // ============================================================
+
+  void _validateEmail(String value) {
+    final email = value.trim();
+
+    if (email.isEmpty) {
+      setState(() {
+        _emailStatus = EmailStatus.empty;
+        _emailMessage = 'Email is required';
+        _emailState = FieldState.error;
+      });
+      return;
+    }
+
+    final message = Validators.validateEmail(email);
 
     setState(() {
       if (message != null) {
-        _cPasswordMessage = message;
-        _cPasswordState = FieldState.error;
-      } else if (!passwordsMatch) {
-        _cPasswordMessage = 'Passwords do not match';
-        _cPasswordState = FieldState.error;
+        // Email format is invalid.
+        _emailStatus = EmailStatus.invalid;
+        _emailMessage = message;
+        _emailState = FieldState.error;
       } else {
-        _cPasswordMessage = null;
-        _cPasswordState = FieldState.normal;
+        // Email format is valid,
+        // but we have not checked the server yet.
+        _emailStatus = EmailStatus.validNotChecked;
+        _emailMessage = null;
+        _emailState = FieldState.normal;
       }
     });
   }
+
+  // ============================================================
+  // EMAIL AVAILABILITY CHECK
+  // ============================================================
+
+  Future<void> _checkEmailAndContinue() async {
+    // ------------------------------------------------------------
+    // Validate name first
+    // ------------------------------------------------------------
+
+    final nameMessage = Validators.validateName(_nameController.text);
+
+    setState(() {
+      _nameMessage = nameMessage;
+      _nameState = nameMessage == null ? FieldState.normal : FieldState.error;
+    });
+
+    // Stop if name is invalid
+    if (nameMessage != null) {
+      return;
+    }
+
+    // ------------------------------------------------------------
+    // Validate email
+    // ------------------------------------------------------------
+
+    final email = _emailController.text.trim();
+
+    _validateEmail(email);
+
+    // Stop if email format is invalid
+    if (_emailStatus != EmailStatus.validNotChecked) {
+      return;
+    }
+
+    // ------------------------------------------------------------
+    // Check email availability
+    // ------------------------------------------------------------
+
+    setState(() {
+      _emailStatus = EmailStatus.checking;
+      _checkingEmail = true;
+    });
+
+    try {
+      final exists = await _authService.checkEmail(email);
+
+      if (!mounted) return;
+
+      if (exists) {
+        setState(() {
+          _emailStatus = EmailStatus.registered;
+          _emailState = FieldState.error;
+          _emailMessage = 'Email is already registered';
+        });
+
+        AppMessage.show(
+          context,
+          message: 'Email is already registered',
+          type: MessageType.warning,
+        );
+
+        return;
+      }
+
+      // Email is available
+      setState(() {
+        _emailStatus = EmailStatus.available;
+        _emailState = FieldState.normal;
+        _emailMessage = null;
+      });
+
+      await Future.delayed(const Duration(milliseconds: 500));
+
+      if (!mounted) return;
+
+      _addCount();
+    } catch (e) {
+      if (!mounted) return;
+
+      setState(() {
+        _emailStatus = EmailStatus.error;
+        _emailState = FieldState.error;
+        _emailMessage = 'Could not verify email availability';
+      });
+
+      AppMessage.show(context, message: e.toString(), type: MessageType.error);
+    } finally {
+      if (!mounted) return;
+
+      setState(() {
+        _checkingEmail = false;
+      });
+    }
+  }
+
+  // ============================================================
+  // NEW PASSWORD VALIDATION
+  // ============================================================
+
+  void _validateNewPassword(String value) {
+    final message = Validators.validatePassword(value);
+
+    setState(() {
+      _newPasswordMessage = message;
+      _newPasswordState = message == null
+          ? FieldState.normal
+          : FieldState.error;
+    });
+
+    // Re-check confirmation when password changes.
+    if (_confirmPasswordController.text.isNotEmpty) {
+      _validateConfirmPassword(_confirmPasswordController.text);
+    }
+  }
+
+  // ============================================================
+  // CONFIRM PASSWORD VALIDATION
+  // ============================================================
+
+  void _validateConfirmPassword(String value) {
+    final message = Validators.validatePassword(value);
+
+    final passwordsMatch = value == _newPasswordController.text;
+
+    setState(() {
+      if (message != null) {
+        _confirmPasswordMessage = message;
+        _confirmPasswordState = FieldState.error;
+      } else if (!passwordsMatch) {
+        _confirmPasswordMessage = 'Passwords do not match';
+        _confirmPasswordState = FieldState.error;
+      } else {
+        _confirmPasswordMessage = null;
+        _confirmPasswordState = FieldState.normal;
+      }
+    });
+  }
+
+  // ============================================================
+  // REGISTER
+  // ============================================================
+
+  Future<void> _register() async {
+    // Validate password fields.
+    _validateNewPassword(_newPasswordController.text);
+
+    _validateConfirmPassword(_confirmPasswordController.text);
+
+    // Validate name.
+    if (_nameController.text.trim().isEmpty) {
+      setState(() {
+        _nameState = FieldState.error;
+        _nameMessage = 'Full name is required';
+      });
+    }
+
+    // Email must have been confirmed as available.
+    if (_emailStatus != EmailStatus.available) {
+      AppMessage.show(
+        context,
+        message: 'Please verify that your email is available',
+        type: MessageType.warning,
+      );
+      return;
+    }
+
+    // Validate all fields before sending the request.
+    if (_nameMessage != null ||
+        _newPasswordMessage != null ||
+        _confirmPasswordMessage != null ||
+        _newPasswordController.text.isEmpty ||
+        _confirmPasswordController.text.isEmpty) {
+      AppMessage.show(
+        context,
+        message: 'Please fill the fields correctly',
+        type: MessageType.error,
+      );
+      return;
+    }
+
+    final model = RegisterRequest(
+      name: Validators.capitalizeWords(_nameController.text.trim()),
+      email: _emailController.text.trim(),
+      password: _newPasswordController.text,
+      passwordConfirmation: _confirmPasswordController.text,
+    );
+
+    await register(model: model);
+  }
+
+  // ============================================================
+  // API REGISTRATION
+  // ============================================================
 
   Future<void> register({required RegisterRequest model}) async {
     setState(() {
@@ -175,11 +363,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     try {
       await context.read<AuthProvider>().registerUser(model);
+
       if (!mounted) return;
 
       AppMessage.show(
         context,
-        message: "Registered Successfully",
+        message: 'Registered Successfully',
         type: MessageType.success,
       );
 
@@ -189,6 +378,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
       AppMessage.show(context, message: e.toString(), type: MessageType.error);
     } finally {
+      if (!mounted) return;
+
       setState(() {
         _isLoading = false;
       });
@@ -204,112 +395,36 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   // ============================================================
-  // PAGE 1
+  // PAGE 1 — BASIC INFORMATION
   // ============================================================
 
   Widget page1() {
     return Column(
       children: [
-        // -------------------- First Name --------------------
+        // -------------------- Full Name --------------------
         CustomTextField(
           model: CustomTextFieldModel(
-            controller: _fName,
-            labelText: 'First Name',
-            hintText: 'Enter first name',
+            controller: _nameController,
+            labelText: 'Full Name',
+            hintText: 'Enter your full name',
             keyboardType: TextInputType.name,
             textInputAction: TextInputAction.next,
-            state: _fNameState,
-            message: _fNameMessage,
-            onChanged: _validateFName,
+            state: _nameState,
+            message: _nameMessage,
+            onChanged: _validateName,
           ),
         ),
+
         30.h.verticalSpace,
 
-        // -------------------- Middle Name --------------------
-        CustomTextField(
-          model: CustomTextFieldModel(
-            controller: _mName,
-            labelText: 'Middle Name',
-            hintText: 'Enter middle name (Optional)',
-            keyboardType: TextInputType.name,
-            textInputAction: TextInputAction.next,
-            state: _mNameState,
-            message: _mNameMessage,
-            onChanged: _validateMName,
-          ),
-        ),
-        30.h.verticalSpace,
-        // -------------------- Last Name --------------------
-        CustomTextField(
-          model: CustomTextFieldModel(
-            controller: _lName,
-            labelText: 'Last Name',
-            hintText: 'Enter last name',
-            keyboardType: TextInputType.name,
-            textInputAction: TextInputAction.next,
-            state: _lNameState,
-            message: _lNameMessage,
-            onChanged: _validateLName,
-          ),
-        ),
-        30.h.verticalSpace,
-
-        // -------------------- Next Button --------------------
-        Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            AppButton(
-              text: 'Next',
-              height: AppDimensions.buttonHeight,
-              borderRadius: AppRadius.large,
-              width: AppDimensions.smallButtonWidth,
-              isLoading: _isLoading,
-              onPressed: () {
-                if (_fNameState == FieldState.normal &&
-                    _mNameState == FieldState.normal &&
-                    _lNameState == FieldState.normal &&
-                    _fName.text.isNotEmpty &&
-                    _lName.text.isNotEmpty) {
-                  _addCount();
-                  return;
-                }
-
-                setState(() {
-                  if (_fName.text.isEmpty) {
-                    _fNameState = FieldState.error;
-                    _fNameMessage = 'First Name is required';
-                  }
-
-                  if (_lName.text.isEmpty) {
-                    _lNameState = FieldState.error;
-                    _lNameMessage = 'Last Name is required';
-                  }
-                });
-
-                AppMessage.show(
-                  context,
-                  message: 'Please fill the fields correctly',
-                  type: MessageType.error,
-                );
-              },
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget page2() {
-    return Column(
-      children: [
         // -------------------- Email --------------------
         CustomTextField(
           model: CustomTextFieldModel(
-            controller: _email,
+            controller: _emailController,
             labelText: 'Email',
-            hintText: 'Enter email',
+            hintText: 'Enter your email',
             keyboardType: TextInputType.emailAddress,
-            textInputAction: TextInputAction.next,
+            textInputAction: TextInputAction.done,
             state: _emailState,
             message: _emailMessage,
             onChanged: _validateEmail,
@@ -318,80 +433,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
         30.h.verticalSpace,
 
-        // -------------------- Button --------------------
+        // -------------------- Next Button --------------------
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.end,
           children: [
             AppButton(
-              text: 'Back',
-              backgroundColor: AppColors.inactive,
-              // foregroundColor: AppColors.textPrimary,
+              text: _checkingEmail ? 'Checking...' : 'Next',
               height: AppDimensions.buttonHeight,
               borderRadius: AppRadius.large,
               width: AppDimensions.smallButtonWidth,
-              onPressed: () {
-                if (_emailMessage != null) {
-                  _email.clear();
-                  _emailState = FieldState.normal;
-                  _emailMessage = null;
-                }
-                _subCount();
-              },
-            ),
-            AppButton(
-              text: 'Next',
-              height: AppDimensions.buttonHeight,
-              borderRadius: AppRadius.large,
-              width: AppDimensions.smallButtonWidth,
-              isLoading: _isLoading,
-              onPressed: () async {
-                setState(() {
-                  _isLoading = true;
-                });
-
-                try {
-                  if (_emailMessage == null) {
-                    final bool exists = await _authService.checkEmail(
-                      _email.text,
-                    );
-
-                    if (!mounted) return;
-
-                    if (exists) {
-                      setState(() {
-                        _emailState = FieldState.error;
-                        _emailMessage = 'Email is already registered';
-                      });
-                      AppMessage.show(
-                        context,
-                        message: _emailMessage.toString(),
-                        type: MessageType.warning,
-                      );
-                      return;
-                    } else {
-                      setState(() {
-                        _emailState = FieldState.normal;
-                      });
-                    }
-
-                    if (_emailState == FieldState.normal) {
-                      _addCount();
-                    }
-                  }
-                } catch (e) {
-                  if (!mounted) return;
-
-                  AppMessage.show(
-                    context,
-                    message: e.toString(),
-                    type: MessageType.error,
-                  );
-                } finally {
-                  setState(() {
-                    _isLoading = false;
-                  });
-                }
-              },
+              isLoading: _isLoading || _checkingEmail,
+              onPressed: _checkEmailAndContinue,
             ),
           ],
         ),
@@ -399,113 +451,98 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  Widget page3() {
+  // ============================================================
+  // PAGE 2 — SECURITY
+  // ============================================================
+
+  Widget page2() {
     return Column(
       children: [
         // -------------------- New Password --------------------
         CustomTextField(
           model: CustomTextFieldModel(
-            controller: _nPassword,
-            labelText: 'New Password',
-            hintText: 'New Password',
+            controller: _newPasswordController,
+            labelText: 'Password',
+            hintText: 'Enter your password',
             keyboardType: TextInputType.visiblePassword,
             textInputAction: TextInputAction.next,
-            state: _nPasswordState,
-            message: _nPasswordMessage,
-            onChanged: _validatePassword,
-            obscureText: _nObscure,
+            state: _newPasswordState,
+            message: _newPasswordMessage,
+            onChanged: _validateNewPassword,
+            obscureText: _newPasswordObscure,
             suffixIcon: IconButton(
               onPressed: () {
                 setState(() {
-                  _nObscure = !_nObscure;
+                  _newPasswordObscure = !_newPasswordObscure;
                 });
               },
               icon: Icon(
-                _nObscure
+                _newPasswordObscure
                     ? Icons.visibility_off_outlined
                     : Icons.visibility_outlined,
               ),
             ),
           ),
         ),
+
         30.h.verticalSpace,
 
         // -------------------- Confirm Password --------------------
         CustomTextField(
           model: CustomTextFieldModel(
-            controller: _cPassword,
+            controller: _confirmPasswordController,
             labelText: 'Confirm Password',
-            hintText: 'Confirm Password',
+            hintText: 'Re-enter your password',
             keyboardType: TextInputType.visiblePassword,
-            textInputAction: TextInputAction.next,
-            state: _cPasswordState,
-            message: _cPasswordMessage,
-            onChanged: _validateCPassword,
-            obscureText: _cObscure,
+            textInputAction: TextInputAction.done,
+            state: _confirmPasswordState,
+            message: _confirmPasswordMessage,
+            onChanged: _validateConfirmPassword,
+            obscureText: _confirmPasswordObscure,
             suffixIcon: IconButton(
               onPressed: () {
                 setState(() {
-                  _cObscure = !_cObscure;
+                  _confirmPasswordObscure = !_confirmPasswordObscure;
                 });
               },
               icon: Icon(
-                _cObscure
+                _confirmPasswordObscure
                     ? Icons.visibility_off_outlined
                     : Icons.visibility_outlined,
               ),
             ),
           ),
         ),
+
         30.h.verticalSpace,
 
-        // -------------------- Next Button --------------------
+        // -------------------- Buttons --------------------
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             AppButton(
               text: 'Back',
               backgroundColor: AppColors.inactive,
-              // foregroundColor: AppColors.textPrimary,
               height: AppDimensions.buttonHeight,
               borderRadius: AppRadius.large,
               width: AppDimensions.smallButtonWidth,
-              onPressed: () {
-                if (_nPasswordMessage != null) {
-                  _nPassword.clear();
-                  _nPasswordState = FieldState.normal;
-                  _nPasswordMessage = null;
-                }
-                if (_cPasswordMessage != null) {
-                  _cPassword.clear();
-                  _cPasswordState = FieldState.normal;
-                  _cPasswordMessage = null;
-                }
-
-                _subCount();
-              },
+              onPressed: _subCount,
             ),
+
             AppButton(
               text: 'Register',
               height: AppDimensions.buttonHeight,
               borderRadius: AppRadius.large,
               width: AppDimensions.smallButtonWidth,
               isLoading: _isLoading,
-              onPressed: () async {
-                String name = _fName.text + _mName.text + _lName.text;
-                final model = RegisterRequest(
-                  name: name,
-                  email: _email.text,
-                  password: _nPassword.text,
-                  passwordConfirmation: _cPassword.text,
-                );
-                register(model: model);
-              },
+              onPressed: _register,
             ),
           ],
         ),
       ],
     );
   }
+
   // ============================================================
   // REGISTER HEADER
   // ============================================================
@@ -532,12 +569,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   void dispose() {
-    _fName.dispose();
-    _mName.dispose();
-    _lName.dispose();
-    _email.dispose();
-    _nPassword.dispose();
-    _cPassword.dispose();
+    _nameController.dispose();
+    _emailController.dispose();
+    _newPasswordController.dispose();
+    _confirmPasswordController.dispose();
 
     super.dispose();
   }
@@ -548,11 +583,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final Map<int, Widget> pages = {1: page1(), 2: page2(), 3: page3()};
+    final Map<int, Widget> pages = {1: page1(), 2: page2()};
+
     return Scaffold(
       body: Stack(
         children: [
           const AuthBackground(),
+
           SafeArea(
             child: LayoutBuilder(
               builder: (context, constraints) {
@@ -582,7 +619,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           headerFields: [_registerHeaderFields()],
                           formFields: [_registerFormFields(pages[_counter]!)],
                           dividerText: 'or',
-                          footerText: "Already have an account? Login now",
+                          footerText: 'Already have an account? Login now',
                           onFooterPressed: () {
                             Navigator.pushNamed(context, AppRoutes.login);
                           },

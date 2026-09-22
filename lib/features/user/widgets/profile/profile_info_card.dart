@@ -9,6 +9,7 @@ class ProfileInfoCard extends StatefulWidget {
   final String title;
   final String? content;
   final int maxLines;
+  final VoidCallback? onEdit;
 
   const ProfileInfoCard({
     super.key,
@@ -16,6 +17,7 @@ class ProfileInfoCard extends StatefulWidget {
     required this.title,
     this.content,
     this.maxLines = 3,
+    this.onEdit,
   });
 
   @override
@@ -30,12 +32,16 @@ class _ProfileInfoCardState extends State<ProfileInfoCard> {
     return LayoutBuilder(
       builder: (context, constraints) {
         final textPainter = TextPainter(
-          text: TextSpan(text: widget.content, style: AppTextStyles.bodyMedium),
+          text: TextSpan(
+            text: widget.content ?? '',
+            style: AppTextStyles.bodyMedium,
+          ),
           maxLines: widget.maxLines,
           textDirection: TextDirection.ltr,
         )..layout(maxWidth: constraints.maxWidth);
 
         final hasOverflow = textPainter.didExceedMaxLines;
+        final hasContent = widget.content?.trim().isNotEmpty ?? false;
 
         return Container(
           width: double.infinity,
@@ -56,24 +62,24 @@ class _ProfileInfoCardState extends State<ProfileInfoCard> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    children: [
-                      Icon(widget.icon, size: 20.r),
+                  Icon(widget.icon, size: 20.r),
 
-                      AppSpacing.sm.w.horizontalSpace,
+                  AppSpacing.sm.w.horizontalSpace,
 
-                      Text(widget.title, style: AppTextStyles.bodyLarge),
-                    ],
+                  Expanded(
+                    child: Text(widget.title, style: AppTextStyles.bodyLarge),
                   ),
 
-                  Icon(
-                    (widget.content == null || widget.content == "")
-                        ? Icons.add
-                        : Icons.mode_edit_outline,
-                    size: 20.r,
-                    color: AppColors.inactive,
+                  IconButton(
+                    onPressed: widget.onEdit,
+                    icon: Icon(
+                      hasContent ? Icons.mode_edit_outline : Icons.add,
+                      size: 20.r,
+                      color: AppColors.inactive,
+                    ),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
                   ),
                 ],
               ),
@@ -81,7 +87,7 @@ class _ProfileInfoCardState extends State<ProfileInfoCard> {
               AppSpacing.md.h.verticalSpace,
 
               Text(
-                widget.content ?? "",
+                widget.content ?? '',
                 maxLines: isExpanded ? null : widget.maxLines,
                 overflow: isExpanded
                     ? TextOverflow.visible
@@ -89,9 +95,9 @@ class _ProfileInfoCardState extends State<ProfileInfoCard> {
                 style: AppTextStyles.bodyMedium,
               ),
 
-              AppSpacing.xs.h.verticalSpace,
-
               if (hasOverflow) ...[
+                AppSpacing.xs.h.verticalSpace,
+
                 GestureDetector(
                   onTap: () {
                     setState(() {
@@ -99,7 +105,7 @@ class _ProfileInfoCardState extends State<ProfileInfoCard> {
                     });
                   },
                   child: Text(
-                    isExpanded ? "Show less" : "Show more",
+                    isExpanded ? 'Show less' : 'Show more',
                     style: AppTextStyles.labelLarge.copyWith(
                       color: AppColors.primary,
                     ),

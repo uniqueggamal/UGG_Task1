@@ -1,6 +1,8 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:internship_task/features/auth/services/notification_services.dart';
 import 'package:internship_task/features/user/providers/user_provider.dart';
 import 'package:internship_task/firebase_options.dart';
 import 'package:provider/provider.dart';
@@ -11,12 +13,21 @@ import 'package:internship_task/core/providers/sub_provider.dart';
 import 'package:internship_task/core/theme/app_theme.dart';
 import 'package:internship_task/features/auth/providers/auth_provider.dart';
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // Initialize Firebase
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  final authProvider = AuthProvider();
 
+  // Register background FCM handler (TOP-LEVEL function, not a class method)
+  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+
+  // Initialize notification service
+  final notificationService = NotificationService();
+  await notificationService.initialize();
+
+  // Check existing Laravel authentication
+  final authProvider = AuthProvider();
   await authProvider.checkAuth();
 
   runApp(

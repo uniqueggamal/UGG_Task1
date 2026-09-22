@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import 'package:internship_task/core/theme/app_radius.dart';
 import 'package:internship_task/core/theme/app_spacing.dart';
-import 'package:internship_task/features/user/widgets/initialization/initialization_field.dart';
+import 'package:internship_task/core/widgets/cutom_textfield/custom_textfield.dart';
+import 'package:internship_task/core/widgets/cutom_textfield/models/custom_textfield_model.dart';
 
 class AboutYouStep extends StatelessWidget {
-  const AboutYouStep({
-    super.key,
-    required this.descriptionController,
-  });
+  const AboutYouStep({super.key, required this.descriptionController});
 
   final TextEditingController descriptionController;
 
@@ -30,48 +27,20 @@ class AboutYouStep extends StatelessWidget {
 
         SizedBox(height: AppSpacing.lg.h),
 
-        InitializationField(
-          label: 'Description',
-          hint: 'Tell us something about yourself...',
-          controller: descriptionController,
-        ),
+        // --------------------------------------------------
+        // Description
+        // --------------------------------------------------
+        Text('Description', style: textTheme.labelLarge),
 
-        SizedBox(height: AppSpacing.lg.h),
+        SizedBox(height: AppSpacing.sm.h),
 
-        Container(
-          width: double.infinity,
-          padding: EdgeInsets.all(AppSpacing.lg.r),
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: colorScheme.outline,
-            ),
-            borderRadius: BorderRadius.circular(AppRadius.medium),
-          ),
-          child: Column(
-            children: [
-              Icon(
-                Icons.person_outline,
-                size: 48.r,
-                color: colorScheme.onSurfaceVariant,
-              ),
-
-              SizedBox(height: AppSpacing.sm.h),
-
-              Text(
-                'Profile Image',
-                style: textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-
-              SizedBox(height: AppSpacing.xs.h),
-
-              Text(
-                'Profile image upload will be added later.',
-                style: textTheme.bodySmall,
-                textAlign: TextAlign.center,
-              ),
-            ],
+        CustomTextField(
+          model: CustomTextFieldModel(
+            controller: descriptionController,
+            hintText: 'Tell us something about yourself...',
+            keyboardType: TextInputType.multiline,
+            textInputAction: TextInputAction.newline,
+            maxLines: 5,
           ),
         ),
       ],

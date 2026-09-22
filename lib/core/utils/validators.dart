@@ -44,37 +44,61 @@ class Validators {
       return 'Name is required';
     }
 
-    if (value.trim().length < 2) {
+    final name = value.trim();
+
+    if (name.length < 2) {
       return 'Name must be at least 2 characters';
     }
 
-    // Optional: only allow letters, spaces, hyphens and apostrophes
-    if (!RegExp(r"^[a-zA-Z\s\-']+$").hasMatch(value.trim())) {
-      return 'Name can only contain letters, spaces, hyphens and apostrophes';
+    if (RegExp(r'[\d]').hasMatch(name)) {
+      return 'Name cannot contain numbers';
     }
 
-    return null; // valid
+    if (RegExp(r'''[!@#$%^&*()_+=\[\]{};:"\\|,.<>/?~`€£¥]''').hasMatch(name)) {
+      return 'Name cannot contain special characters';
+    }
+
+    return null;
   }
 
-  static String? validateMiddleName(String? value) {
-    // Middle name is optional → empty is allowed
+  static String capitalizeWords(String value) {
+    return value
+        .split(' ')
+        .map(
+          (word) => word.isEmpty
+              ? word
+              : '${word[0].toUpperCase()}${word.substring(1).toLowerCase()}',
+        )
+        .join(' ');
+  }
+
+  static String? validatePhone(String? value) {
     if (value == null || value.trim().isEmpty) {
-      return null; // valid
+      return null;
     }
 
-    final name = value.trim();
+    final phone = value.trim().replaceAll(RegExp(r'[\s-]'), '');
 
-    if (name.length < 1) {
-      return 'Middle name is too short';
+    if (!RegExp(r'^(?:\+977)?9[678]\d{8}$').hasMatch(phone)) {
+      return 'Please enter a valid Nepali phone number';
     }
 
-    if (name.length > 30) {
-      return 'Middle name is too long';
+    return null;
+  }
+
+  static String? validateLocation(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return null;
     }
 
-    // Allow letters, spaces, hyphens and apostrophes (same as fname/lname)
-    if (!RegExp(r"^[a-zA-ZÀ-ÿ\s\-']+$").hasMatch(name)) {
-      return 'Please enter a valid middle name';
+    final location = value.trim();
+
+    if (location.length < 2) {
+      return 'Location must be at least 2 characters';
+    }
+
+    if (location.length > 100) {
+      return 'Location is too long';
     }
 
     return null;
