@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:internship_task/core/constants/routes.dart';
+import 'package:internship_task/core/theme/app_radius.dart';
 import 'package:provider/provider.dart';
 
 import 'package:internship_task/core/theme/app_colors.dart';
@@ -581,7 +582,7 @@ class _ProfileSetupState extends State<ProfileSetup> {
             ),
             TextButton(
               onPressed: () =>
-                  Navigator.pushReplacementNamed(context, AppRoutes.profile),
+                  Navigator.popAndPushNamed(context, AppRoutes.home),
               child: const Text(
                 'Cancel',
                 style: TextStyle(color: AppColors.error),
@@ -623,7 +624,7 @@ class _ProfileSetupState extends State<ProfileSetup> {
                   onPressed: () => _confirmCancel(),
                   icon: const Icon(Icons.arrow_back),
                   color: AppColors.onPrimary,
-                  iconSize: 24,
+                  iconSize: AppRadius.large,
                   tooltip: 'Back',
                 )
               : null,
